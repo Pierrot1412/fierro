@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Search Complaint Report</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts -->
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- Custom styles -->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+    <!-- JavaScript libraries -->
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
+</head>
+<body id="page-top">
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h1 class="h3 mb-0 text-gray-800">Search Complaint Report</h1>
+        </div>
+        <div class="card-body">
+            <form action="security.php" method="post">
+                <div class="form-group">
+                    <h2>Choose the way to search</h2>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="searchByNumber" name="searchOption" class="custom-control-input">
+                        <label class="custom-control-label" for="searchByNumber">Number Case</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="searchByDate" name="searchOption" class="custom-control-input">
+                        <label class="custom-control-label" for="searchByDate">Date</label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="numberCaseInput" style="display:none;">
+                    <label for="numberCase">Enter the Number Case</label>
+                    <input type="number" name="numberCase" id="numberCase" class="form-control" placeholder="Enter the Number Case">
+                </div>
+
+                <div class="form-group" id="dateInput" style="display:none;">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" name="startDate" id="startDate" class="form-control">
+                    <label for="endDate">End Date</label>
+                    <input type="date" name="endDate" id="endDate" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a href="search.php" class="btn btn-secondary" id="backButton" style="display:none;">Back</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Custom scripts for all pages-->
+<script src="../js/sb-admin-2.min.js"></script>
+
+<script>
+document.getElementById('searchByNumber').onchange = function() {
+    document.getElementById('numberCaseInput').style.display = 'block';
+    document.getElementById('dateInput').style.display = 'none';
+    document.getElementById('backButton').style.display = 'block';
+};
+
+document.getElementById('searchByDate').onchange = function() {
+    document.getElementById('dateInput').style.display = 'block';
+    document.getElementById('numberCaseInput').style.display = 'none';
+    document.getElementById('backButton').style.display = 'block';
+};
+</script>
+</body>
+</html>
