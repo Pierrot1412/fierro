@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPLAINT REPORT</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
+    <!-- Custom styles for this template-->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">COMPLAINT REPORT</h3>
+        </div>
+        <div class="card-body">
+            <form action="upload.php" method="post" enctype="multipart/form-data">
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="numberCase">CASE #</label>
+                        <input type="number" class="form-control" name="numberCase" id="numberCase" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="mont">MONTH</label>
+                        <select name="month" id="month" class="form-control">
+                            <option value="">Select</option>
+                            <option value="1">JANUARY</option>
+                            <option value="2">FEBRUARY</option>
+                            <option value="3">MARCH</option>
+                            <option value="4">APRIL</option>
+                            <option value="5">MAY</option>
+                            <option value="6">JUNE</option>
+                            <option value="7">JULY</option>
+                            <option value="8">AUGUST</option>
+                            <option value="9">SEPTEMBER</option>
+                            <option value="10">OCTOBER</option>
+                            <option value="11">NOVEMBER</option>
+                            <option value="12">DECEMBER</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="year">YEAR</label>
+                        <input type="number" class="form-control" name="year" id="year">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="dateRequest">DATE</label>
+                        <input type="date" class="form-control" name="dateRequest" id="dateRequest" required>
+                    </div>
+                </div>
+                <hr/>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="upcNumber">UPC No.</label>
+                        <input type="number" class="form-control" name="upcNumber" id="upcNumber">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="fsorretail">FS OR RETAIL</label>
+                        <input type="text" class="form-control" name="fsorretail" id="fsorretail">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="item">ITEM #</label>
+                        <input type="number" class="form-control" name="item" id="item">
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="description">DESCRIPTION</label>
+                        <input type="text" class="form-control" name="description" id="description">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="complaintCategory">COMPLAINT CATEGORY</label>
+                        <input type="text" class="form-control" name="complaintCategory" id="complaintCategory" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="assignedEmployee">ASSIGNED EMPLOYEE</label>
+                        <input type="text" class="form-control" name="asiggnedEmployee" id="assignedEmployee" required>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="lotCode">LOT - CODE</label>
+                        <input type="text" class="form-control" name="lotCode" id="lotCode">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="plant">PLANT</label>
+                        <input type="text" class="form-control" name="plant" id="plant">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="lineType">LINE TYPE</label>
+                        <input type="text" class="form-control" name="lineType" id="lineType">
+                    </div>
+                </div>
+                <hr/>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="productionDate">PRODUCTION DATE</label>
+                        <input type="date" class="form-control" name="productionDate" id="productionDate">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productionTime">PRODUCTION TIME</label>
+                        <input type="time" class="form-control" name="productionTime" id="productionTime"  min="00:00" max="23:59">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productionShift">PRODUCTION SHIFT</label>
+                        <input type="number" class="form-control" name="productionShift" id="productionShift">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="expiryDate">EXPIRY DATE</label>
+                        <input type="date" class="form-control" name="expiryDate" id="expiryDate">
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="issueDescription">ISSUE DESCRIPTION</label>
+                    <textarea class="form-control" name="issueDescription" id="issueDescription" rows="3" required></textarea>
+                </div>
+                <hr/>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-6">
+                        <label for="customerContact">CUSTOMER CONTACT</label>
+                        <input type="text" class="form-control" name="customerContact" id="customerContact" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="yearQuarter">YEAR QUARTER</label>
+                        <input type="number" class="form-control" name="yearQuarter" id="yearQuarter">
+                    </div>
+                     <!------>
+                    <div class="form-group col-md-3">
+                        <label for="week">WEEK</label>
+                        <input class="form-control" type="number" name="week" id="week">
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group  col-md-3">
+                       <label for="ComplaintSource">COMPLAINT SOURCE</label>
+                        <input class="form-control" type="text" name="ComplaintSource" id="ComplaintSource">
+                    </div>
+                    <div class="form-group  col-md-4">
+                       <label for="">CUSTOMER NAME</label>
+                       <input class="form-control" type="text" name="CustomerName" id="CustomerName">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="CouponType">COUPON TYPE</label>
+                        <input class="form-control" type="text" name="CouponType" id="CouponType">
+                    </div>
+
+                    <!------>
+                    <div class="form-group col-md-2">
+                        <label for="assignedCoupons">ASSIGNED COUPONS</label>
+                        <input class="form-control" type="number" name="assignedCoupons" id="assignedCoupons" min="0">
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group  col-md-3">
+                        <label for="">ADDRESS</label>
+                        <input class="form-control" type="text" name="Address" id="Address" required>
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="">DATE RESOLVED</label>
+                        <input class="form-control" type="date" name="DateResolved" id="DateResolved" required>
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="">PHONE</label>
+                        <input class="form-control" type="tel" name="Phone" id="Phone">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="">EMAIL</label>
+                        <input class="form-control" type="email" name="Email" id="Email">
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="Comments">COMMENTS</label>
+                    <textarea class="form-control" name="Comments" id="Comments" rows="3" required></textarea>
+                </div>
+
+
+                <div class="form-row mb-3">
+                <div class="form-group col-md-12">
+                    
+                    <label class="form-check-label">DO YOU WANT ADD IMAGE?</label>
+                    <input class="form-ckeck-input" type="checkbox" id="displayCheck">
+                   
+                    
+                <div class="form-row mb-3" id="fileInput" style="display:none;">
+                <hr>
+                    <label for="imageUpload" class="form-label">SELECT IMAGEN</label>
+                    <input class="form-control" type="file" name="imageUpload[]" id="imageUpload" multiple>
+                </div>
+                </div>
+
+
+
+               
+                <div class="form-group mb-3"
+                <div class="form-group col-md-6">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('displayCheck').onchange = function(){
+    if (this.checked) {document.getElementById('fileInput').style.display='block';
+	}else{document.getElementById('fileInput').style.display='none';
+    }
+}
+</script>
+<!-- Bootstrap core JavaScript-->
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="../js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="../js/demo/datatables-demo.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".selected-row").click(function() {
+            $(this).toggleClass("highlight");
+        });
+    });
+</script>
+<script>
+    var dateRequest = new Date();
+    var year = dateRequest.getFullYear();
+    var month = (dateRequest.getMonth() + 1).toString().padStart(2, '0');
+    var day = dateRequest.getDate().toString().padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+    document.getElementById('dateRequest').value = formattedDate;
+</script>
+</body>
+</html>
