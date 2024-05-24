@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Search Complaint Report</title>
+
+    <!--enlaces-->
+    <!-- Agregar enlaces a Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!--EE------->
+        <!-- Custom fonts for this template-->
+        <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+        <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+            <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+      <script type="text/javascript" src="../js/downloadFile.js"></script>
+
+        <!-- Custom styles for this template-->
+        <link href="../css/sb-admin-2.css" rel="stylesheet">
+      <!-- EE ------->
+  </head>
+  <body id="page-top">
+    <div class="container-fluid">
+      <div class="card-body">
+        <form class="" action="security.php" method="post">
+
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <fieldset>
+              <ol>
+
+                <h1>SEARCH </h1>
+                <div class="form-row mb-3">
+                <div class="form-group col-md-12">
+                  <hr>
+                    <br>
+                  <h2>Choose the way to search</h2>
+                  <hr>
+                    <div class="form-row mb-3" id="displayIn">
+                      <input class="form-ckeck-input" type="radio" id="displayCheck">
+                      <label for="numberCase">Number Case</label>
+                    </div>
+                    <br><br>
+                    <div class="form-row mb-3" id="displayIn2">
+                      <input class="form-ckeck-input" type="radio" id="displayCheck2">
+                      <label for="numberCase">Date</label>
+                    </div>
+
+
+
+                  <div class="form-row mb-3" id="fileInput" style="display:none;">
+                    <input class="form-control" type="number" name="numberCase" id="numberCase" placeholder="Enter the Number Case">
+                  </div>
+
+
+                  <div class="form-row mb-3" id="fileInput2" style="display:none;">
+                    <label for="startDate=">start Date</label>
+                    <input class="form-control" type="date" name="startDate" id="startDate">
+                    <label for="endDate">End date</label>
+                    <input class="form-control" type="date" name="endDate" id="endDate">
+                  </div>
+                </div>
+              </ol>
+
+
+              <div class="form-row mb-3">
+              <a href="search.php">
+              <button class="btn btn-primary" type="button" name="back" id="buttonBack" style="display:none;">BACK</button>
+              </a>
+              </div>
+            </fieldset>
+
+          </div>
+        </form>
+      </div>
+      <script>
+        document.getElementById('displayCheck').onchange = function(){
+          if (this.checked) {document.getElementById('fileInput').style.display='block';
+          document.getElementById('displayIn2').style.display='none';
+          document.getElementById('buttonBack').style.display='block';
+
+        }
+
+      }
+
+      document.getElementById('displayCheck2').onchange = function(){
+        if (this.checked) {document.getElementById('fileInput2').style.display='block';
+        document.getElementById('displayIn').style.display='none';
+        document.getElementById('buttonBack').style.display='block';
+      }
+
+      }
+
+
+
+
+    </script>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="../js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="../js/demo/datatables-demo.js"></script>
+    <script>
+
+    $(document).ready(function() {
+    $(".selected-row").click(function() {
+      $(this).toggleClass("highlight");
+    });
+  });
+
+  </script>
+  </body>
+</html>
