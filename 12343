@@ -113,4 +113,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($uploadedFiles)) {
         foreach ($uploadedFiles as $file) {
             $sqlInsertFile = "INSERT INTO PictureTable (CaseNumber, FileName) VALUES (?, ?)";
-            $paramsFile =
+            $paramsFile = array($numberCase, $file);
+            $stmtInsertFile = sqlsrv_query($conexion, $sqlInsertFile, $paramsFile);
+            if ($stmtInsertFile === false) {
+                echo "Error in executing file statement.\n";
+                die(print_r(sqlsrv_errors(), true));
+            }
+        }
+    }
+
+    // Redirigir al formulario principal
+    header("Location: form6.php");
+}
+?>
