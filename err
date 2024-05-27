@@ -591,3 +591,64 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
 </body>
 </html>
+
+
+
+<?php
+function searchPhotos($directory, $code) {
+    // Array to hold the results
+    $photos = array();
+
+    // Ensure the directory exists
+    if (!is_dir($directory)) {
+        die("Directory not found: $directory");
+    }
+
+    // Open the directory
+    $dir = opendir($directory);
+
+    // Loop through the files in the directory
+    while (($file = readdir($dir)) !== false) {
+        // Skip the current and parent directory links
+        if ($file == '.' || $file == '..') {
+            continue;
+        }
+
+        // Construct the full path of the file
+        $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
+
+        // Check if the file is a photo (you can expand this list)
+        $photoExtensions = array('jpg', 'jpeg', 'png', 'gif');
+        $fileExtension = pathinfo($fullPath, PATHINFO_EXTENSION);
+
+        if (in_array(strtolower($fileExtension), $photoExtensions)) {
+            // Check if the file name contains the code
+            if (strpos($file, $code) !== false) {
+                $photos[] = $fullPath;
+            }
+        }
+    }
+
+    // Close the directory
+    closedir($dir);
+
+    return $photos;
+}
+
+// Define the directory and the code to search for
+$directory = '\\\\shared\\folder\\path'; // Replace with the actual UNC path to your shared folder
+$code = '12345'; // Replace with the actual code you are looking for
+
+// Call the function and get the results
+$photos = searchPhotos($directory, $code);
+
+// Print the results
+if (count($photos) > 0) {
+    echo "Photos containing the code '$code':<br>";
+    foreach ($photos as $photo) {
+        echo $photo . "<br>";
+    }
+} else {
+    echo "No photos found containing the code '$code'.";
+}
+?>
