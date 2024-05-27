@@ -1,0 +1,5 @@
+PHP Fatal error:  Uncaught TypeError: DateTime::__construct(): Argument #1 ($datetime) must be of type string, DateTime given in C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\reclamos\searchindb.php:139
+Stack trace:
+#0 C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\reclamos\searchindb.php(139): DateTime->__construct()
+#1 {main}
+  thrown in C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\reclamos\searchindb.php on line 139
