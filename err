@@ -10,3 +10,27 @@ Stack trace:
   <td><?php $datestring = $row['Date'];
                                     $Date = new DateTime($datestring);
                                     echo $Date->format('m-d-Y');?></td>
+
+..
+
+
+
+if ($row) {
+    $datestring = $row['date_column'];
+
+    // Verificar si la fecha es un objeto DateTime o una cadena
+    if ($datestring instanceof DateTime) {
+        // Si ya es un objeto DateTime, simplemente formatearlo
+        echo $datestring->format('m-d-Y');
+    } else {
+        // Si es una cadena, crear un nuevo objeto DateTime
+        try {
+            $Date = new DateTime($datestring);
+            echo $Date->format('m-d-Y');
+        } catch (Exception $e) {
+            echo "Error al convertir la fecha: " . $e->getMessage();
+        }
+    }
+} else {
+    echo "No se encontraron resultados.";
+}
