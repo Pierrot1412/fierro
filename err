@@ -3,3 +3,10 @@ Stack trace:
 #0 C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\reclamos\searchindb.php(139): DateTime->__construct()
 #1 {main}
   thrown in C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\reclamos\searchindb.php on line 139
+
+
+
+
+  <td><?php $datestring = $row['Date'];
+                                    $Date = new DateTime($datestring);
+                                    echo $Date->format('m-d-Y');?></td>
