@@ -235,3 +235,207 @@ if (!$tabla) {
                             </body>
 
                             </html>
+
+
+
+-----------------------------------------------------
+<?php
+require_once("../includes/config.ini.php");
+require_once("../includes/clases/conexion.php");
+session_save_path($CONFIG->path);
+session_start();
+date_default_timezone_set('US/Eastern');
+
+// Obtener el número de caso desde POST
+$numberCase = isset($_POST['numberCase']) ? $_POST['numberCase'] : '';
+
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+
+if ($conexion === false) {
+    die("Connection Error: " . print_r(sqlsrv_errors(), true));
+}
+
+$SQL = "SELECT * FROM [ComplaintManagement]";
+$params = array();
+
+if (!empty($numberCase)) {
+    if (is_numeric($numberCase)) {
+        $SQL .= " WHERE CaseNum = ?";
+        $params[] = $numberCase;
+    }
+}
+
+$options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+$tabla = sqlsrv_query($conexion, $SQL, $params, $options);
+
+if ($tabla === false) {
+    die("Error Query 1: " . print_r(sqlsrv_errors(), true));
+}
+
+$rowsCheck = sqlsrv_has_rows($tabla);
+
+if ($rowsCheck === false) {
+    echo "No records found.";
+}
+
+function searchPhotos($directory, $code) {
+    $photos = array();
+    if (!is_dir($directory)) {
+        die("Directory not found: $directory");
+    }
+
+    $dir = opendir($directory);
+
+    while (($file = readdir($dir)) !== false) {
+        if ($file == '.' || $file == '..') {
+            continue;
+        }
+
+        $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
+
+        $photoExtensions = array('jpg', 'jpeg', 'png', 'mp4');
+        $fileExtension = pathinfo($fullPath, PATHINFO_EXTENSION);
+
+        if (in_array(strtolower($fileExtension), $photoExtensions)) {
+            if (strpos($file, $code) !== false) {
+                $photos[] = $fullPath;
+            }
+        }
+    }
+
+    closedir($dir);
+    return $photos;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Employee Matching</title>
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+    <style>
+        .highlight {
+            background-color: #b3e0ff;
+        }
+    </style>
+</head>
+<body id="page-top">
+    <div class="container-fluid">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h3 class="h4 mb-0 text-gray-800">ALL EMPLOYEES </h3>
+            </div>
+
+            <div id="printArea">
+                <br>
+                <div class="col-md-3 offset-sm-4 text-center">
+                    <a href="search.php"><button type="button" class="btn btn-primary">Back </button></a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>CaseNum</th>
+                                    <th>Date</th>
+                                    <th>Year</th>
+                                    <th>Month</th>
+                                    <th>UPCNum</th>
+                                    <th>Channel</th>
+                                    <th>ItemNum</th>
+                                    <th>ItemDesc</th>
+                                    <th>Complaint_Category</th>
+                                    <th>Assigned_Employee</th>
+                                    <th>LotCode</th>
+                                    <th>Plant</th>
+                                    <th>LineType</th>
+                                    <th>ProdDate</th>
+                                    <th>ProdTime</th>
+                                    <th>ProdShift</th>
+                                    <th>ExpDate</th>
+                                    <th>IssueDesc</th>
+                                    <th>CustContact</th>
+                                    <th>YearQt</th>
+                                    <th>Week</th>
+                                    <th>ComplaintSource</th>
+                                    <th>CustomerName</th>
+                                    <th>CouponType</th>
+                                    <th>CouponQty</th>
+                                    <th>Address</th>
+                                    <th>DateResolved</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>PictureProvided</th>
+                                    <th>Comments</th>
+                                    <th>Photos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = sqlsrv_fetch_array($tabla, SQLSRV_FETCH_ASSOC)) { ?>
+                                    <tr>
+                                        <td><?php echo $row['CaseNum']; ?></td>
+                                        <td><?php $Date = $row['Date']; echo $Date->format('m-d-Y'); ?></td>
+                                        <td><?php echo $row['Year']; ?></td>
+                                        <td><?php echo $row['Month']; ?></td>
+                                        <td><?php echo $row['UPCNum']; ?></td>
+                                        <td><?php echo $row['Channel']; ?></td>
+                                        <td><?php echo $row['ItemNum']; ?></td>
+                                        <td><?php echo $row['ItemDesc']; ?></td>
+                                        <td><?php echo $row['Complaint_Category']; ?></td>
+                                        <td><?php echo $row['Assigned_Employee']; ?></td>
+                                        <td><?php echo $row['LotCode']; ?></td>
+                                        <td><?php echo $row['Plant']; ?></td>
+                                        <td><?php echo $row['LineType']; ?></td>
+                                        <td><?php $Date = $row['ProdDate']; echo $Date->format('m-d-Y'); ?></td>
+                                        <td><?php echo $row['ProdTime']; ?></td>
+                                        <td><?php echo $row['ProdShift']; ?></td>
+                                        <td><?php $Date = $row['ExpDate']; echo $Date->format('m-d-Y'); ?></td>
+                                        <td><?php echo $row['IssueDesc']; ?></td>
+                                        <td><?php echo $row['CustContact']; ?></td>
+                                        <td><?php echo $row['YearQt']; ?></td>
+                                        <td><?php echo $row['Week']; ?></td>
+                                        <td><?php echo $row['ComplaintSource']; ?></td>
+                                        <td><?php echo $row['CustomerName']; ?></td>
+                                        <td><?php echo $row['CouponType']; ?></td>
+                                        <td><?php echo $row['CouponQty']; ?></td>
+                                        <td><?php echo $row['Address']; ?></td>
+                                        <td><?php $Date = $row['DateResolved']; echo $Date->format('m-d-Y'); ?></td>
+                                        <td><?php echo $row['Phone']; ?></td>
+                                        <td><?php echo $row['Email']; ?></td>
+                                        <td><?php echo $row['PictureProvided']; ?></td>
+                                        <td><?php echo $row['Comments']; ?></td>
+                                        <td>
+                                            <?php
+                                            $directory = 'uploads'; // Cambia esta ruta a tu carpeta compartida
+                                            $code = $row['CaseNum'];
+
+                                            $photos = searchPhotos($directory, $code);
+
+                                            if (count($photos) > 0) {
+                                                echo "Photos containing the code '$code':<br>";
+                                                foreach ($photos as $photo) {
+                                                    echo $photo . "<br>";
+                                                }
+                                            } else {
+                                                echo "No photos found containing the code '$code'.";
+                                            }
+                                            ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
