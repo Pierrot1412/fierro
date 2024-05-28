@@ -1,0 +1,38 @@
+<?php
+require_once ("../includes/config.ini.php");
+require_once ("../includes/clases/conexion.php");
+
+session_save_path($CONFIG->path);
+session_start();
+date_default_timezone_set('US/Eastern');
+
+// Conectar a la base de datos
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+
+if ($conexion === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Obtener el valor del campo de fecha
+$dateField = isset($_POST['dateField']) ? $_POST['dateField'] : null;
+
+// Verificar si el campo de fecha está vacío y establecerlo en NULL si es necesario
+if (empty($dateField)) {
+    $dateField = null;
+}
+
+// Preparar y ejecutar la consulta SQL
+$sql = "INSERT INTO YourTable (DateColumn) VALUES (?)";
+$params = array($dateField);
+
+$stmt = sqlsrv_query($conexion, $sql, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+echo "Record inserted successfully.";
+
+// Cerrar la conexión
+sqlsrv_close($conexion);
+?>
