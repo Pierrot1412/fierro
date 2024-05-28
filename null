@@ -36,3 +36,50 @@ echo "Record inserted successfully.";
 // Cerrar la conexión
 sqlsrv_close($conexion);
 ?>
+
+
+
+<?php
+require_once ("../includes/config.ini.php");
+require_once ("../includes/clases/conexion.php");
+
+session_save_path($CONFIG->path);
+session_start();
+date_default_timezone_set('US/Eastern');
+
+// Conectar a la base de datos
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+
+if ($conexion === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Obtener los valores de los campos del formulario
+$dateField1 = isset($_POST['dateField1']) ? $_POST['dateField1'] : null;
+$dateField2 = isset($_POST['dateField2']) ? $_POST['dateField2'] : null;
+$textField = isset($_POST['textField']) ? $_POST['textField'] : null;
+
+// Verificar y convertir los campos de fecha a NULL si están vacíos
+$dateField1 = empty($dateField1) ? null : date('Y-m-d', strtotime($dateField1));
+$dateField2 = empty($dateField2) ? null : date('Y-m-d', strtotime($dateField2));
+
+// Verificar los campos de texto
+$textField = empty($textField) ? null : $textField;
+
+// Preparar y ejecutar la consulta SQL
+$sql = "INSERT INTO YourTable (DateColumn1, DateColumn2, TextColumn) VALUES (?, ?, ?)";
+$params = array($dateField1, $dateField2, $textField);
+
+// Ejecutar la consulta
+$stmt = sqlsrv_query($conexion, $sql, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+echo "Record inserted successfully.";
+
+// Cerrar la conexión
+sqlsrv_close($conexion);
+?>
+
