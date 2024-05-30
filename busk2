@@ -1,0 +1,44 @@
+<?php
+header('Content-Type: application/json');
+
+// Datos de conexión a la base de datos
+$serverName = "TU_SERVIDOR";
+$connectionOptions = array(
+    "Database" => "TU_BASE_DE_DATOS",
+    "Uid" => "TU_USUARIO",
+    "PWD" => "TU_CONTRASEÑA"
+);
+
+// Establecer la conexión
+$conn = sqlsrv_connect($serverName, $connectionOptions);
+
+if ($conn === false) {
+    die(json_encode(array("error" => "No se pudo conectar a la base de datos.")));
+}
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Consulta SQL
+    $sql = "SELECT field1, field2 FROM TuTabla WHERE id = ?";
+    $params = array($id);
+    $stmt = sqlsrv_query($conn, $sql, $params);
+
+    if ($stmt === false) {
+        die(json_encode(array("error" => "Error al ejecutar la consulta.")));
+    }
+
+    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    if ($row) {
+        echo json_encode($row);
+    } else {
+        echo json_encode(array("error" => "No se encontraron datos."));
+    }
+
+    sqlsrv_free_stmt($stmt);
+} else {
+    echo json_encode(array("error" => "No se proporcionó ningún ID."));
+}
+
+sqlsrv_close($conn);
+?>
