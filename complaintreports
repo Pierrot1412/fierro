@@ -422,5 +422,5 @@ $NextCaseNum = $CN . $digits;
 echo "El próximo número de aplicación es: " . $NextCaseNum;
 
 
-
+Error al obtener el próximo número de aplicación: Array ( [0] => Array ( [0] => 22018 [SQLSTATE] => 22018 [1] => 245 [code] => 245 [2] => [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Conversion failed when converting the nvarchar value 'CN000001' to data type int. [message] => [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Conversion failed when converting the nvarchar value 'CN000001' to data type int. ) )
 
