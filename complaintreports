@@ -1,0 +1,394 @@
+
+<?php
+require_once ("../includes/config.ini.php");
+date_default_timezone_set('US/Eastern');
+
+///revisando la sesion y mostrar los eventos creados por el username
+///inicio
+session_save_path($CONFIG->path);
+session_start();
+
+if (!isset($_SESSION['user_name'])) {
+		header("location: \login.php");
+		exit();
+}
+
+$username = $_SESSION['user_name'];
+
+require_once ("../includes/clases/conexion.php");
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+if ($conexion === false) {
+    die("Error Conection: " . print_r(sqlsrv_errors(), true));
+}
+
+
+
+
+
+/// query para obtener el prximo numero de aplicacion
+$sql2 = "SELECT MAX(CAST(CaseNum AS INT)) + 1 AS NextCaseNum1 FROM [ComplaintManagement]";
+$stmt2 = sqlsrv_query($conexion, $sql2);
+if ($stmt2 === false) {
+    die("Error al obtener el próximo número de aplicación: " . print_r(sqlsrv_errors(), true));
+}
+$row2 = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC);
+$NextCaseNum1 = $row2['NextCaseNum1'];
+
+// en caso de que no haya ningu numero de aplicacion en la base de datos, se asigna 1
+if ($NextCaseNum1 === null) {
+    $NextCaseNum1 = 1;
+}
+
+$digits = str_pad(($NextCaseNum1 % 100), 6, '0', STR_PAD_LEFT);
+$CN = "CN";
+$NextCaseNum = $CN . $digits;
+
+?>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPLAINT REPORT</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
+    <!-- Custom styles for this template-->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">COMPLAINT REPORT</h3>
+        </div>
+        <div class="card-body">
+            <form action="upload.php" method="post" enctype="multipart/form-data">
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="numberCase">CASE #</label>
+                        <input type="text" class="form-control" name="numberCase" id="numberCase" value="<?php echo $NextCaseNum; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="mont">MONTH</label>
+												<input type="number" class="form-control" name="month" id="month" min="1" max="12" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="year">YEAR</label>
+                        <input type="number" class="form-control" name="year" id="year">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="dateRequest">DATE</label>
+                        <input type="date" class="form-control" name="dateRequest" id="dateRequest" required>
+                    </div>
+                </div>
+                <hr/>
+								<div class="form-row mb-3">
+									<div class="form-group col-md-4">
+											<label for="fsorretail">FS OR RETAIL</label>
+											<select name="fsorretail" id="fsorretail" class="form-control">
+													<option value="">Select</option>
+													<option value="FOOD SERVICE">FOOD SERVICE</option>
+													<option value="RETAIL">RETAIL</option>
+													<option value="N/A">N/A</option>
+											</select>
+									</div>
+                    <div class="form-group col-md-4">
+                        <label for="complaintCategory">COMPLAINT CATEGORY</label>
+												<select class="form-control" name="complaintCategory" id="complaintCategory" required>
+													<option value="">Select</option>
+													<option value="BLOATED - HIGH">BLOATED - HIGH</option>
+													<option value="CONTAMINATION - HIGH">CONTAMINATION - HIGH</option>
+													<option value="DOUGH CLUMPS - HIGH">DOUGH CLUMPS - HIGH</option>
+													<option value="FOREIGN MATERIAL - HIGH">FOREIGN MATERIAL - HIGH</option>
+													<option value="MISLABELED PRODUCT - HIGH">MISLABELED PRODUCT - HIGH</option>
+													<option value="MOLDY - HIGH">MOLDY - HIGH</option>
+													<option value="RANCID - HIGH">RANCID - HIGH</option>
+													<option value="TORTILLA STAMPED - HIGH">TORTILLA STAMPED - HIGH</option>
+													<option value="GREASE MARKS - MEDIUM">GREASE MARKS - MEDIUM</option>
+													<option value="MOISTURE - MEDIUM">MOISTURE - MEDIUM</option>
+													<option value="UNDERCOOKED - MEDIUM">UNDERCOOKED - MEDIUM</option>
+													<option value="WRONG CODE DATE - MEDIUM">WRONG CODE DATE - MEDIUM</option>
+													<option value="BREAKING - LOW">BREAKING - LOW</option>
+													<option value="BROKEN - LOW">BROKEN - LOW</option>
+													<option value="CUTS - LOW">CUTS - LOW</option>
+													<option value="DIDN'T LIKE PRODUCT - LOW">DIDN'T LIKE PRODUCT - LOW</option>
+													<option value="DOESN'T MELT - LOW">DOESN'T MELT - LOW</option>
+													<option value="DRY - LOW">DRY - LOW</option>
+													<option value="DRY/CRACKING - LOW">DRY/CRACKING - LOW</option>
+													<option value="EXPIRATION ISSUE - LOW">EXPIRATION ISSUE - LOW</option>
+													<option value="EXPIRED - LOW">EXPIRED - LOW</option>
+													<option value="HOLES - LOW">HOLES - LOW</option>
+													<option value="MASHED/FOLDED - LOW">MASHED/FOLDED - LOW</option>
+													<option value="NO EXPIRATION DATE - LOW">NO EXPIRATION DATE - LOW</option>
+													<option value="NO LABEL - LOW">NO LABEL - LOW</option>
+													<option value="OFF FLAVOR - LOW">OFF FLAVOR - LOW</option>
+													<option value="OFF SMELL - LOW">OFF SMELL - LOW</option>
+													<option value="OVERCOOKED - LOW">OVERCOOKED - LOW</option>
+													<option value="PACKAGING - LOW">PACKAGING - LOW</option>
+													<option value="PACKAGING SEAL - LOW">PACKAGING SEAL - LOW</option>
+													<option value="RUNNY - LOW">RUNNY - LOW</option>
+													<option value="SHORT COUNT - LOW">SHORT COUNT - LOW</option>
+													<option value="SIZE - LOW">SIZE - LOW</option>
+													<option value="STALE - LOW">STALE - LOW</option>
+													<option value="STICKING - LOW">STICKING - LOW</option>
+													<option value="STICKY - LOW">STICKY - LOW</option>
+													<option value="THIN - LOW">THIN - LOW</option>
+													<option value="TOO SALTY - LOW">TOO SALTY - LOW</option>
+													<option value="ZIPLOC BAG ISSUE - LOW">ZIPLOC BAG ISSUE - LOW</option>
+
+												</select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="assignedEmployee">ASSIGNED EMPLOYEE</label>
+                        <input type="text" class="form-control" name="asiggnedEmployee" id="assignedEmployee" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" required>
+                    </div>
+                </div>
+
+								<div class="form-row mb-3">
+								    <div class="form-group col-md-4">
+								        <label for="item">ITEM #</label>
+								        <div class="input-group">
+								            <input type="number" class="form-control" name="item" id="item">
+								            <div class="input-group-append">
+								                <button class="btn btn-primary" type="button" onclick="busquedaItem()">Buscar</button>
+								            </div>
+								        </div>
+								    </div>
+								    <div class="form-group col-md-4">
+								        <label for="upcNumber">UPC No.</label>
+								        <input type="text" class="form-control" name="upcNumber" id="upcNumber">
+								    </div>
+								    <div class="form-group col-md-4">
+								        <label for="description">DESCRIPCIÓN</label>
+								        <input type="text" class="form-control" name="description" id="description">
+								    </div>
+								</div>
+
+
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="lotCode">LOT - CODE</label>
+                        <input type="text" class="form-control" name="lotCode" id="lotCode" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="plant">PLANT</label>
+                        <input type="text" class="form-control" name="plant" id="plant" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+										<!--		<select class="form-control" name="plant" id="plant">
+													<option value="">Select</option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>   no se tiene la informacion completa, se preguntara
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+													<option value=""></option>
+
+												</select>-->
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="lineType">LINE TYPE</label>
+                        <input type="text" class="form-control" name="lineType" id="lineType" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                </div>
+
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="productionDate">PRODUCTION DATE</label>
+                        <input type="date" class="form-control" name="productionDate" id="productionDate">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productionTime">PRODUCTION TIME</label>
+                        <input type="time" class="form-control" name="productionTime" id="productionTime"  min="00:00" max="23:59">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productionShift">PRODUCTION SHIFT</label>
+                        <select name="productionShift" id="productionShift" class="form-control">
+                          <option value="">Select</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="expiryDate">EXPIRY DATE</label>
+                        <input type="date" class="form-control" name="expiryDate" id="expiryDate">
+                    </div>
+                </div>
+								  <hr/>
+                <div class="form-group mb-3">
+                    <label for="issueDescription">ISSUE DESCRIPTION</label>
+                    <textarea class="form-control" name="issueDescription" id="issueDescription" rows="3" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" required></textarea>
+                </div>
+                <hr/>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="customerContact">CUSTOMER CONTACT</label>
+                        <input type="text" class="form-control" name="customerContact" id="customerContact" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" required><!--preguntar si es quien llenara el registro-->
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="yearQuarter">YEAR QUARTER</label>
+                      <select name="yearQuarter" id="yearQuarter" class="form-control">
+                          <option value="">Select</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                        </select>
+                    </div>
+                     <!------>
+                    <div class="form-group col-md-4">
+                        <label for="week">WEEK</label>
+                        <input class="form-control" type="number" name="week" id="week" min="1" max="52" value="<?php
+												$currentWeekNumber = date("W");
+												echo $currentWeekNumber;
+												?>">
+                    </div>
+
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group  col-md-5">
+                       <label for="">CUSTOMER NAME</label>
+                       <input class="form-control" type="text" name="CustomerName" id="CustomerName" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group  col-md-5">
+                        <label for="CouponType">COUPON TYPE</label>
+                        <input class="form-control" type="text" name="CouponType" id="CouponType" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+
+                    <!------>
+                    <div class="form-group col-md-2">
+                        <label for="assignedCoupons">ASSIGNED COUPONS</label>
+                        <input class="form-control" type="number" name="assignedCoupons" id="assignedCoupons" min="0">
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group  col-md-6">
+                        <label for="">ADDRESS</label>
+                        <input class="form-control" type="text" name="Address" id="Address" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" required>
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="">PHONE</label>
+                        <input class="form-control" type="text" name="Phone" id="Phone">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="">EMAIL</label>
+                        <input class="form-control" type="text" name="Email" id="Email" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                <div class="form-group col-md-12">
+
+                    <label class="form-check-label">DO YOU WANT ADD IMAGE?</label>
+                    <input class="form-ckeck-input" type="checkbox" id="displayCheck">
+
+
+                <div class="form-row mb-3" id="fileInput" style="display:none;">
+                <hr>
+                    <label for="imageUpload" class="form-label">SELECT IMAGEN</label>
+                    <input class="form-control" type="file" name="imageUpload[]" id="imageUpload" multiple accept="image/*,video/*">
+                </div>
+                </div>
+
+
+
+
+                <div class="form-group mb-3"
+                <div class="form-group col-md-6">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    async function busquedaItem() {
+        const item = document.getElementById('item').value;
+        if (item) {
+            try {
+                const response = await fetch('searchItem.php?id=${item}');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.error) {
+                        alert(data.error);
+                        document.getElementById('upcNumber').value = '';
+                        document.getElementById('description').value = '';
+                    } else {
+                        document.getElementById('upcNumber').value = data.ProductBarcode;
+                        document.getElementById('description').value = data.ProductName;
+                    }
+                } else {
+                    alert('Error al buscar el dato.');
+                    document.getElementById('upcNumber').value = '';
+                    document.getElementById('description').value = '';
+                }
+            } catch (error) {
+                console.error('Error al buscar el dato:', error);
+                alert('Error al buscar el dato.');
+            }
+        } else {
+            alert('ingrese un Item.');
+            document.getElementById('upcNumber').value = '';
+            document.getElementById('description').value = '';
+        }
+    }
+</script>
+
+<script>
+document.getElementById('displayCheck').onchange = function(){
+    if (this.checked) {document.getElementById('fileInput').style.display='block';
+	}else{document.getElementById('fileInput').style.display='none';
+    }
+}
+</script>
+<!-- Bootstrap core JavaScript-->
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="../js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="../js/demo/datatables-demo.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".selected-row").click(function() {
+            $(this).toggleClass("highlight");
+        });
+    });
+</script>
+<script>
+    var dateRequest = new Date();
+    var year = dateRequest.getFullYear();
+    var month = (dateRequest.getMonth() + 1).toString().padStart(2, '0');
+    var day = dateRequest.getDate().toString().padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+    document.getElementById('dateRequest').value = formattedDate;
+		document.getElementById('month').value = month;
+		document.getElementById('year').value = year;
+</script>
+
+</body>
+</html>
