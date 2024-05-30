@@ -392,3 +392,35 @@ document.getElementById('displayCheck').onchange = function(){
 
 </body>
 </html>
+
+
+
+
+
+$sql2 = "SELECT 
+            ISNULL(MAX(CAST(CaseNum AS INT)), 0) + 1 AS NextCaseNum1 
+         FROM [ComplaintManagement]";
+$stmt2 = sqlsrv_query($conexion, $sql2);
+
+if ($stmt2 === false) {
+    die("Error al obtener el próximo número de aplicación: " . print_r(sqlsrv_errors(), true));
+}
+
+$row2 = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC);
+$NextCaseNum1 = $row2['NextCaseNum1'];
+
+// En caso de que no haya ningún número de aplicación en la base de datos, se asigna 1 (esto ya se maneja con ISNULL en la consulta SQL)
+if ($NextCaseNum1 === null) {
+    $NextCaseNum1 = 1;
+}
+
+// Asegurarse de que el número de caso se formatee correctamente
+$digits = str_pad(($NextCaseNum1), 6, '0', STR_PAD_LEFT);
+$CN = "CN";
+$NextCaseNum = $CN . $digits;
+
+echo "El próximo número de aplicación es: " . $NextCaseNum;
+
+
+
+
