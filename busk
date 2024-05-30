@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rellenar Campos Automáticamente</title>
+</head>
+<body>
+    <form>
+        <label for="inputID">ID:</label>
+        <input type="text" id="inputID" name="inputID" oninput="fetchData()">
+        <br><br>
+        <label for="field1">Campo 1:</label>
+        <input type="text" id="field1" name="field1" readonly>
+        <br><br>
+        <label for="field2">Campo 2:</label>
+        <input type="text" id="field2" name="field2" readonly>
+    </form>
+
+    <script>
+        async function fetchData() {
+            const inputID = document.getElementById('inputID').value;
+            if (inputID) {
+                try {
+                    const response = await fetch(`fetch_data.php?id=${inputID}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('field1').value = data.field1;
+                        document.getElementById('field2').value = data.field2;
+                    } else {
+                        document.getElementById('field1').value = '';
+                        document.getElementById('field2').value = '';
+                    }
+                } catch (error) {
+                    console.error('Error al obtener datos:', error);
+                }
+            } else {
+                document.getElementById('field1').value = '';
+                document.getElementById('field2').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
