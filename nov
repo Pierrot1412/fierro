@@ -1,0 +1,83 @@
+...
+<div class="form-group col-md-4">
+    <label for="item">ITEM #</label>
+    <input type="text" class="form-control" name="item" id="item" oninput="busquedaItem()">
+</div>
+<div class="form-group col-md-4">
+    <label for="upcNumber">UPC No.</label>
+    <input type="text" class="form-control" name="upcNumber" id="upcNumber">
+</div>
+<div class="form-group col-md-4">
+    <label for="description">DESCRIPTION</label>
+    <input type="text" class="form-control" name="description" id="description">
+</div>
+...
+
+<script>
+async function busquedaItem() {
+    const item = document.getElementById('item').value;
+    if (item) {
+        try {
+            const response = await fetch(`searchItem.php?id=${item}`);
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('upcNumber').value = data.ProductBarcode;
+                document.getElementById('description').value = data.ProductName;
+            } else {
+                document.getElementById('upcNumber').value = '';
+                document.getElementById('description').value = '';
+            }
+        } catch (error) {
+            console.error('Error al buscar el dato:', error);
+        }
+    } else {
+        document.getElementById('upcNumber').value = '';
+        document.getElementById('description').value = '';
+    }
+}
+</script>
+...
+
+
+
+<?php
+header('Content-Type: application/json');
+
+require_once("../includes/clases/conexionWizard.php");
+session_save_path($CONFIG->path);
+session_start();
+date_default_timezone_set('US/Eastern');
+
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+
+if ($conexion === false) {
+    die(json_encode(array("error" => "No se pudo conectar a la DB.")));
+}
+
+if (isset($_GET['id'])) {
+    $item = $_GET['id'];
+
+    $sqlItem = "SELECT [ProductCode], [ProductName], [ProductBarcode], [ProductFLCode]
+                FROM [MAS_QRY_ProductInformation]
+                WHERE ItemNum = ?";
+    $parametros = array($item);
+    $stmt = sqlsrv_query($conexion, $sqlItem, $parametros);
+
+    if ($stmt === false) {
+        die(json_encode(array("error" => "Error al ejecutar la query: " . print_r(sqlsrv_errors(), true))));
+    }
+
+    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    if ($row) {
+        echo json_encode($row);
+    } else {
+        echo json_encode(array("error" => "No se encontraron datos."));
+    }
+
+    sqlsrv_free_stmt($stmt);
+} else {
+    echo json_encode(array("error" => "No se ingresó algún item."));
+}
+
+sqlsrv_close($conexion);
+?>
