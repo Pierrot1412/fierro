@@ -1,0 +1,150 @@
+<?php
+
+require_once("../../includes/config.ini.php");
+require_once("../../includes/clases/conexion.php");
+
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+if ($conexion === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$employeeno = "14905"; //$_GET["employeeno"];
+
+// Queries to get information
+$queryCommentb = "SELECT [dauihas], [hahsdfn] FROM [iuhkjed] WHERE cvlkbn = 0";
+$queryCommentg = "SELECT [dauihas], [hahsdfn] FROM [iuhkjed] WHERE cvlkbn = 1";
+$queryAgency = "SELECT [slakenf], [oli5swe] FROM [ret6erte] WHERE [status] = 0";
+
+$tabla5 = sqlsrv_query($conexion, $queryAgency);
+if ($tabla5 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$tabla6 = sqlsrv_query($conexion, $queryCommentb);
+if ($tabla6 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$tabla7 = sqlsrv_query($conexion, $queryCommentg);
+if ($tabla7 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Get employee conversion data
+$SQL = "SELECT * FROM [Convertions] WHERE [EmpNum] = ?";
+$params = array($employeeno);
+$tabla = sqlsrv_query($conexion, $SQL, $params);
+if ($tabla === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$rows = sqlsrv_has_rows($tabla);
+if ($rows === false) {
+    $result = "<div>
+        <h4 style='color: black; font-weight: normal; font-size: 15px; font-family: Arial;text-transform: uppercase;' align='center'>The employee you are trying to get doesn't exist or is no longer active</h4>
+    </div>";
+} else {
+    $columna = sqlsrv_fetch_array($tabla);
+    $area = $columna["AreaCode"];
+    $subarea = $columna["SubAreaCode"];
+    $plant = $columna["PlantCode"];
+    $agencyCode = $columna["AgencyCode"];
+    $agencyDesc = $columna["AgencyDesc"];
+    $position = $columna["PositionCode"];
+    $shift = $columna["ShiftCode"];
+    $hireDate = ($columna['HireDate'] !== null) ? $columna['HireDate']->format('m-d-Y') : '';
+    $status = $columna["Status"];
+    $requestDate = ($columna['requestDate'] !== null) ? $columna['requestDate']->format('m-d-Y') : '';
+    $AgencyCodeNew = $columna["AgencyCodeNew"];
+}
+
+// Get employee information
+$SQLIn = "SELECT * FROM [EmployeeInformation] WHERE [EmpNum] = ?";
+$tablaIn = sqlsrv_query($conexion, $SQLIn, $params);
+if ($tablaIn === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$columnaIn = sqlsrv_fetch_array($tablaIn);
+$employeeno2 = $columnaIn["EmpNum"];
+$firstname2 = $columnaIn["Firstname"];
+$lastname2 = $columnaIn["Lastname"];
+$rateold2 = number_format($columnaIn["Rate"], 2);
+$hoursold2 = number_format($columnaIn["AllowedHours"], 0);
+$area2 = $columnaIn["AreaCode"];
+$subarea2 = $columnaIn["SubAreaCode"];
+$plant2 = $columnaIn["PlantCode"];
+$agencyCode2 = $columnaIn["AgencyCode"];
+$agencyDesc2 = $columnaIn["AgencyDesc"];
+$position2 = $columnaIn["PositionCode"];
+$shift2 = $columnaIn["ShiftCode"];
+$hireDate2 = $columnaIn["HireDate"];
+
+// Close the database connection
+sqlsrv_close($conexion);
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="<?php echo $CONFIG->cssregistros; ?>" />
+    <script type="text/javascript" src="<?php echo $CONFIG->jsqueryvalida; ?>"></script>
+    <script type="text/javascript" src="jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="jquery.validate.js"></script>
+</head>
+
+<body>
+    <div>
+        <form name="validar" id="validar" method="post" action="insertconvertionSelect.php">
+            <fieldset>
+                <h4 style="color: #F64D0D; font-weight: normal; font-size: 15px; font-family: Arial;text-transform: uppercase;" align="center">Employee Information Rise</h4>
+                <ol>
+                    <li><label>Convertion Date:</label></li>
+                    <li><input type="date" name="currentDate2" id="currentDate2" readonly></li>
+                    <br>
+                    <li><label>Employee No.</label></li>
+                    <li><output name="employeeno" id="employeeno"><?php echo "$employeeno2"; ?></output></li>
+                    <li><label>Last Name:</label></li>
+                    <li><output name="lastname" id="lastname"><?php echo "$lastname2"; ?></output></li>
+                    <li><label>First Name</label></li>
+                    <li><output name="firstname" id="firstname"><?php echo "$firstname2"; ?></output></li>
+                    <li><label>New Agency</label></li>
+                    <li><output name="AgencyCodeNew" id="AgencyCodeNew"><?php echo "$AgencyCodeNew"; ?></output></li>
+                    <br>
+                    <li><label>New Employee Number</label></li>
+                    <li><input type="number" name="newEmployeeNumber" id="newEmployeeNumber" placeholder="Enter the New Employee Number">
+                        <br><br>
+                        <ol class="buttons">
+                            <li>
+                                <input type="submit" class="btn btn-success" name="requestBtn" id="requestBtn" value="Approve">
+                            </li>
+                            <li>
+                                <button type="button" class="btn btn-secondary" name="back" id="back" onclick="history.go(-1)">Back</button>
+                            </li>
+                        </ol>
+            </fieldset>
+            <input type="hidden" name="employeeno" id="employeeno" value="<?php echo $employeeno; ?>">
+            <input type="hidden" name="position" id="position" value="<?php echo $position; ?>">
+            <input type="hidden" name="shift" id="shift" value="<?php echo $shift; ?>">
+            <input type="hidden" name="agency" id="agency" value="<?php echo $agencyCode; ?>">
+            <input type="hidden" name="plant" id="plant" value="<?php echo $plant; ?>">
+            <input type="hidden" name="area" id="area" value="<?php echo $area; ?>">
+            <input type="hidden" name="subarea" id="subarea" value="<?php echo $subarea; ?>">
+            <input type="hidden" name="hireDate" id="hireDate" value="<?php echo $hireDate; ?>">
+            <input type="hidden" name="requestDate" value="<?php echo $requestDate; ?>">
+            <input type="hidden" name="AgencyCodeNew" value="<?php echo $AgencyCodeNew; ?>">
+        </form>
+    </div>
+    <script>
+        // Set current date in the Convertion Date field
+        var currentDate2 = new Date();
+        var year = currentDate2.getFullYear();
+        var month = (currentDate2.getMonth() + 1).toString().padStart(2, '0');
+        var day = currentDate2.getDate().toString().padStart(2, '0');
+        var formattedDate = year + '-' + month + '-' + day;
+        document.getElementById('currentDate2').value = formattedDate;
+    </script>
+</body>
+
+</html>
