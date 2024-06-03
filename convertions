@@ -1,3 +1,11 @@
+PHP Fatal error:  Uncaught TypeError: sqlsrv_fetch_array(): Argument #1 ($stmt) must be of type resource, bool given in C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\rafle\convertion\convertionSelect.php:65
+Stack trace:
+#0 C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\rafle\convertion\convertionSelect.php(65): sqlsrv_fetch_array()
+#1 {main}
+  thrown in C:\inetpub\wwwroot\Test\CDS_Expresso_Test\Atlanta\rafle\convertion\convertionSelect.php on line 65
+
+
+
 <?php
 
     require_once ("../../includes/config.ini.php");
