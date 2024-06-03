@@ -1,0 +1,173 @@
+<?php
+
+    require_once ("../../includes/config.ini.php");
+    require_once ("../../includes/clases/conexion.php");
+    $conexion = sqlsrv_connect( $serverName, $connectionInfo);
+    $employeeno= "14905";//$_GET[ "employeeno"];
+  //  $SQL="update skjhadb where sdf5dsf = '$firstname' and ojind5fd = '$lastname';";
+
+  $queryCommentb = "select [dauihas],[hahsdfn] FROM [iuhkjed] where cvlkbn = 0" ;
+  $queryCommentg = "select [dauihas],[hahsdfn] FROM [iuhkjed] where cvlkbn = 1" ;
+
+  $queryAgency = "select [slakenf],[oli5swe] FROM [ret6erte] where [status] = 0" ;
+
+  $tabla1 = sqlsrv_query($conexion, $queryPlanta);
+  $tabla2 = sqlsrv_query($conexion, $queryArea);
+  $tabla3 = sqlsrv_query($conexion, $queryPosition);
+  $tabla4 = sqlsrv_query($conexion, $queryShift);
+  $tabla5 = sqlsrv_query($conexion, $queryAgency);
+    $tabla6 = sqlsrv_query($conexion, $queryCommentb);
+    $tabla7 = sqlsrv_query($conexion, $queryCommentg);
+      $hide = 'display: none';
+
+    $SQL = "select * from [EmployeeInformation] where [EmpNum] = '$employeeno'" ;
+    $tabla = sqlsrv_query($conexion, $SQL);
+    $rows = sqlsrv_has_rows($tabla);
+
+    if ($rows === false){
+      $result = "<div>
+      <h4 style=' color: black; font-weight: normal; font-size: 15px; font-family: Arial;text-transform: uppercase;' align='center'> The employee you are trying to get doesn't exist or is not longer active </h4>
+          </div>";
+  }else{
+
+      while($columna = sqlsrv_fetch_array($tabla)){
+
+           $employeeno= $columna["EmpNum"];
+           $firstname= $columna["Firstname"];
+           $lastname = $columna["Lastname"];
+           $rateold = number_format($columna["Rate"],2);
+           $hoursold = number_format($columna["AllowedHours"],0);
+           $area = $columna["AreaDesc"];
+            $subarea = $columna["SubAreaDesc"];
+            $plant = $columna["PlantCode"];
+            $agencyCode = $columna["AgencyCode"];
+            $agencyDesc = $columna["AgencyDesc"];
+            $position = $columna["PositionDesc"];
+            $shift = $columna["ShiftCode"];
+              $hireDate = ($columna['HireDate'] !== null) ? $columna['HireDate']->format('m-d-Y') : '';
+           if ($columna["Inactive"] == 0){
+             $status = 'ACTIVE';
+           }else{
+             $status = 'INACTIVE';
+           }
+      }
+  }
+    // Cerramos la conexiÃ³n a la Base de Datos
+?>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>LETTER</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
+    <!-- Custom styles for this template-->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+
+    <script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    } );
+      </script>
+
+      <script>
+      function printDiv(printArea) {
+         var contenido= document.getElementById(printArea).innerHTML;
+         var contenidoOriginal= document.body.innerHTML;
+
+         document.body.innerHTML = contenido;
+
+         window.print();
+
+         document.body.innerHTML = contenidoOriginal;
+
+      }
+
+      </script>
+  </head>
+
+
+  <body>
+
+    <div class="container mt-4">
+        <div class="card">
+<div id="printArea">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h3 class="h4 mb-0 text-gray-800">LETTER OF RECOMMENDATION</h3>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-header">ACTIONS:</div>
+                        <a class="dropdown-item" onclick="ExportToExcel3('xlsx')">Export Excel</a>
+                        <a class="dropdown-item" onclick="printDiv('printArea')">Print</a>
+
+
+                    </div>
+                </div>
+              </div>
+
+            <div class="card-body">
+              <p id="textRigth">To Whom It May Concern, </p>
+              <p>With this letter, I recommend <strong><?php echo $firstname . " " . $lastname; ?></strong> as an excellent candidate for the position of <strong><?php echo $position; ?></strong> at Ole Mexican Foods in the subarea <strong><?php echo $subarea; ?></strong> within the area <strong><?php echo $area;?></strong>.</p>
+              <p><strong><?php echo $firstname . " " . $lastname; ?></strong> has been outstanding as a temporary employee of <strong><?php echo $agencyDesc; ?></strong> working at Ole Mexican Foods from <strong><?php echo $hireDate; ?></strong> to today's date.</p>
+              <p><strong><?php echo $firstname . " " . $lastname; ?></strong> has been an excellent temporary employee and a true asset to Ole Mexican Foods. Please initiate the hiring process.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="../js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="../js/demo/datatables-demo.js"></script>
+    <script>
+
+    $(document).ready(function() {
+    $(".selected-row").click(function() {
+      $(this).toggleClass("highlight");
+    });
+  });
+
+  </script>
+  </body>
+</html>
