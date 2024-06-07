@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
+<head>
     <meta charset="utf-8">
     <title>CAPA FORM</title>
     <!-- Custom fonts for this template-->
@@ -8,73 +8,162 @@
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-        <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
-  <script type="text/javascript" src="../js/downloadFile.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
 
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.css" rel="stylesheet">
     <style>
-    .highlight {
-      background-color: #b3e0ff;
-    }
+        .highlight {
+            background-color: #b3e0ff;
+        }
+        #area {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <script>
-$(document).ready(function() {
-    $('#dataTable').DataTable();
-} );
-  </script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable();
+    });
+</script>
 
-  <script>
-  function printDiv(printArea) {
-  	 var contenido= document.getElementById(printArea).innerHTML;
-  	 var contenidoOriginal= document.body.innerHTML;
+<script>
+    function printDiv(printArea) {
+        var contenido = document.getElementById(printArea).innerHTML;
+        var contenidoOriginal = document.body.innerHTML;
 
-  	 document.body.innerHTML = contenido;
-  	 window.print();
-  	 document.body.innerHTML = contenidoOriginal;
-  }
-
-  </script>
-  </head>
-  <body id="page-top">
-    <div class="container-fluid">
-      <div class="card shadow mb-4">
-                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                          <h3 class="h4 mb-0 text-gray-800">ALL EMPLOYEES </h3>
-                          <div class="dropdown no-arrow">
-                              <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                              </a>
-                              <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                  aria-labelledby="dropdownMenuLink">
-                                  <div class="dropdown-header">ACTIONS:</div>
-                                  <a class="dropdown-item" onclick="ExportToExcel3('xlsx')">Export Excel</a>
-                                  <a class="dropdown-item" onclick="printDiv('printArea')">Print</a>
-                      <div id="printArea">
+        document.body.innerHTML = contenido;
+        window.print();
+        document.body.innerHTML = contenidoOriginal;
+    }
+</script>
+<body id="page-top">
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h3 class="h4 mb-0 text-gray-800">ALL EMPLOYEES </h3>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                     aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">ACTIONS:</div>
+                    <a class="dropdown-item" onclick="ExportToExcel3('xlsx')">Export Excel</a>
+                    <a class="dropdown-item" onclick="printDiv('printArea')">Print</a>
+                    <div id="printArea">
                         <div class="card-body">
-                          <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                              <tr id="cabecera_1">
-                                <th rowspan="3" colspan="3"></th>
-                                <th rowspan="3" colspan="8">QUALITY SYSTEMS DOCUMENT</th>
-
-                              </tr>
-                            </table>
-
-                          </div>
-
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"
+                                       border="1">
+                                    <tr id="cabecera_1">
+                                        <th rowspan="4">imagen</th>
+                                        <th rowspan="3" colspan="8">QUALITY SYSTEMS DOCUMENT</th>
+                                        <th>DOCUMENT NUMBER:</th>
+                                        <th>OLE-QA-FO-E027</th>                                        
+                                    </tr>
+                                    <tr>                                        
+                                    </tr>
+                                    <tr>
+                                        <th>REVISION:</th>
+                                        <th>0.11.04.2021</th>
+                                        
+                                    </tr>
+                                    
+                                    <tr>
+                                        <th rowspan="1" colspan="8">CORRECTIVE AND PREVENTIVE ACTION</th>
+                                        <th>PAGE</th>
+                                        <th>1 OF 2</th>
+                                    </tr>
+                                    </table>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"  border="1">
+                                    <tr>
+                                    <td>AUDITOR/ORIGINATOR</td>
+                                    <td>CONSUMER CARE</td>
+                                    <td>ORIGINATION DATE</td>
+                                    <td>______________________</td>
+                                    </tr>
+                                    <tr>
+                                        <td>AFFECTED DEPARTMENT</td>
+                                        <td>_________________________________________________</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PERSONAL INVOICED</td>
+                                        <td>_________________________________________________</td>
+                                    </tr>
+                                    </table>
+                                    <textarea name="area" id="area" rows="5" cols="165"></textarea>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
+                                    <tr>
+                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
+                                        <td>CUSTOMER COMPLAINT</td>
+                                        <td>CUSTOMER NAME</td>
+                                        <td colspan="4">_____________________________</td>
+                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
+                                        <td>VENDOR NONCONFORMANCE</td>
+                                        <td>VENDOR</td>
+                                        <td colspan="4">_____________________________</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
+                                        <td>RETURNED PRODUCT</td>
+                                        <td>PRODUCT ORIGIN</td>
+                                        <td colspan="4">_____________________________</td>
+                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
+                                        <td>EXTERNAL AUDIT</td>
+                                        <td>3RD-</td>
+                                        <td colspan="4">_____________________________</td>
+                                    </tr>
+                                    </table>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
+                                    <tr>
+                                    <td colspan="1"><input type="checkbox" name="" id=""></td>
+                                        <td>INCIDENTE/CCP</td>
+                                        <td>SEVERITY</td>
+                                        <td>________________</td>
+                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
+                                        <td>PREVENTIVE ACTION</td>
+                                        <td>________________</td>
+                                        
+                                    </tr>
+                                    </table>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
+                                    <tr>
+                                        <td>PRODUCT SKU</td>
+                                        <td>____________________________</td>
+                                        <td>PRODUCT DESCRIPTION</td>
+                                        <td>____________________________</td>
+                                        <td>CONSUMER AFFECTED</td>
+                                        <td>_________________________-_</td>
+                                    </tr>
+                                    </table>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
+                                    <tr>
+                                        <td>QUALITY OF PRODUCT</td>
+                                        <td>____________________________</td>
+                                        <td>LOT / BATCH #</td>
+                                        <td>____________________________</td>
+                                        <td>EXP</td>
+                                        <td>_________________________-_</td>
+                                        <td>ITEM #</td>
+                                        <td>_________________________</td>
+                                    </tr>
+                                    </table>
+                            </div>
                         </div>
-
-                      </div>
-
-                              </div>
-                          </div>
-                      </div>
-                      </div
-
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-  </body>
+<!-- Bootstrap Bundle JS with Popper -->
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+</body>
 </html>
