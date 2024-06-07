@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>CAPA FORM</title>
+    <!-- Custom fonts for this template-->
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+        <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script type="text/javascript" src="../js/downloadFile.js"></script>
+
+    <!-- Custom styles for this template-->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+    <style>
+    .highlight {
+      background-color: #b3e0ff;
+    }
+    </style>
+</head>
+<script>
+$(document).ready(function() {
+    $('#dataTable').DataTable();
+} );
+  </script>
+
+  <script>
+  function printDiv(printArea) {
+  	 var contenido= document.getElementById(printArea).innerHTML;
+  	 var contenidoOriginal= document.body.innerHTML;
+
+  	 document.body.innerHTML = contenido;
+  	 window.print();
+  	 document.body.innerHTML = contenidoOriginal;
+  }
+
+  </script>
+  </head>
+  <body id="page-top">
+    <div class="container-fluid">
+      <div class="card shadow mb-4">
+                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                          <h3 class="h4 mb-0 text-gray-800">ALL EMPLOYEES </h3>
+                          <div class="dropdown no-arrow">
+                              <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                              </a>
+                              <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                  aria-labelledby="dropdownMenuLink">
+                                  <div class="dropdown-header">ACTIONS:</div>
+                                  <a class="dropdown-item" onclick="ExportToExcel3('xlsx')">Export Excel</a>
+                                  <a class="dropdown-item" onclick="printDiv('printArea')">Print</a>
+                      <div id="printArea">
+                        <div class="card-body">
+                          <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                              <tr id="cabecera_1">
+                                <th rowspan="3" colspan="3"></th>
+                                <th rowspan="3" colspan="8">QUALITY SYSTEMS DOCUMENT</th>
+
+                              </tr>
+                            </table>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                              </div>
+                          </div>
+                      </div>
+                      </div
+
+    </div>
+
+  </body>
+</html>
