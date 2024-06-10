@@ -1,169 +1,1199 @@
+
+<?php
+
+require_once("includes/config.ini.php");
+date_default_timezone_set('US/Eastern');
+
+
+session_save_path($CONFIG->path);
+session_start();
+
+
+if (!isset($_SESSION['user_name'])) {
+    header("location: /login.php");
+    exit();
+}
+
+$username = $_SESSION['user_name'];
+
+require_once("includes/clases/conexion.php");
+
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+if ($conexion === false) {
+    die("Conection Error: " . print_r(sqlsrv_errors(), true));
+}
+
+
+$numberCaseSearch = isset($_POST['numberCase']) ? $_POST['numberCase'] : '';
+$startDateSearch = isset($_POST['startDate']) ? $_POST['startDate'] : '';
+$endDateSearch = isset($_POST['endDate']) ? $_POST['endDate'] : '';
+
+
+$numberCase = isset($_POST['CaseNum']) ? $_POST['CaseNum'] : '';
+
+
+$SQL = "SELECT * FROM [ComplaintManagement] WHERE CaseNum = ?";
+$parametros = array($numberCase);
+$tabla = sqlsrv_query($conexion, $SQL, $parametros);
+
+if ($tabla === false) {
+    die("Error executing Query: " . print_r(sqlsrv_errors(), true));
+}
+
+$row = sqlsrv_fetch_array($tabla);
+
+
+if (!$row) {
+    die("Case not found.");
+}
+
+
+$CaseNum = $row['CaseNum'];
+$Month = $row['Month'];
+$Year = $row['Year'];
+$Date = $row['Date']->format('m-d-Y');
+$UPCNum = $row['UPCNum'];
+$Channel = $row['Channel'];
+$ItemNum = $row['ItemNum'];
+$ItemDesc = $row['ItemDesc'];
+
+$Assigned_Employee = $row['Assigned_Employee'];
+$LotCode = $row['LotCode'];
+$Plant = $row['Plant'];
+$LineType = $row['LineType'];
+$ProdDate = ($row['ProdDate'] !== null) ? $row['ProdDate']->format('m-d-Y') : '';
+$ProdTime = $row['ProdTime'];
+$ProdShift = $row['ProdShift'];
+$ExpDate = ($row['ExpDate'] !== null) ? $row['ExpDate']->format('m-d-Y') : '';
+$IssueDesc = $row['IssueDesc'];
+$CustContact = $row['CustContact'];
+$YearQt = $row['YearQt'];
+$Week = $row['Week'];
+$CustomerName = $row['CustomerName'];
+$CouponType = $row['CouponType'];
+$CouponQty = $row['CouponQty'];
+$Address = $row['Address'];
+$Phone = $row['Phone'];
+$Email = $row['Email'];
+$Complaint_Category2 = $row['Complaint_Category'];
+switch ($row['Complaint_Category']) {
+  case '0':
+  $Complaint_Category = "BLOATED - HIGH";
+    break;
+
+    case '1':
+    $Complaint_Category = "CONTAMINATION - HIGH";
+      break;
+
+      case '2':
+      $Complaint_Category = "DOUGH CLUMPS - HIGH";
+        break;
+
+  case '3':
+  $Complaint_Category = "FOREIGN MATERIAL - HIGH";
+    break;
+
+    case '4':
+    $Complaint_Category = "MISLABELED PRODUCT - HIGH";
+      break;
+
+      case '5':
+      $Complaint_Category = "MOLDY - HIGH";
+        break;
+
+        case '6':
+        $Complaint_Category = "RANCID - HIGH";
+          break;
+
+          case '7':
+          $Complaint_Category = "TORTILLA STAMPED - HIGH";
+            break;
+
+            case '8':
+            $Complaint_Category = "GREASE MARKS - MEDIUM";
+              break;
+
+              case '9':
+              $Complaint_Category = "MOISTURE - MEDIUM";
+                break;
+
+                case '10':
+                $Complaint_Category = "UNDERCOOKED - MEDIUM";
+                  break;
+
+                  case '11':
+                  $Complaint_Category = "WRONG CODE DATE - MEDIUM";
+                    break;
+
+                    case '12':
+                    $Complaint_Category = "BREAKING - LOW";
+                      break;
+
+                      case '13':
+                      $Complaint_Category = "BROKEN - LOW";
+                        break;
+
+                        case '14':
+                        $Complaint_Category = "CUTS - LOW";
+                          break;
+
+                          case '15':
+                          $Complaint_Category = "DIDN'T LIKE PRODUCT - LOW";
+                            break;
+
+                            case '16':
+                            $Complaint_Category = "DOESN'T MELT - LOW";
+                              break;
+
+                              case '17':
+                                $Complaint_Category = "DRY - LOW";
+                                break;
+
+                                case '18':
+                                  $Complaint_Category = "DRY/CRACKING - LOW";
+                                  break;
+
+                                  case '19':
+                                    $Complaint_Category = "EXPIRATION ISSUE - LOW";
+                                    break;
+
+                                    case '20':
+                                      $Complaint_Category = "EXPIRED - LOW";
+                                      break;
+
+                                      case '21':
+                                        $Complaint_Category = "HOLES - LOW";
+                                        break;
+
+                                        case '22':
+                                          $Complaint_Category = "MASHED/FOLDED - LOW";
+                                          break;
+
+                                          case '23':
+                                            $Complaint_Category = "NO EXPIRATION DATE - LOW";
+                                            break;
+
+                                            case '24':
+                                              $Complaint_Category = "NO LABEL - LOW";
+                                              break;
+
+                                              case '25':
+                                                $Complaint_Category = "OFF FLAVOR - LOW";
+                                                break;
+
+                                                case '26':
+                                                  $Complaint_Category = "OFF SMELL - LOW";
+                                                  break;
+
+                                                  case '27':
+                                                    $Complaint_Category = "OVERCOOKED - LOW";
+                                                    break;
+
+                                                    case '28':
+                                                    $Complaint_Category = "PACKAGING - LOW";
+                                                      break;
+
+                                                      case '29':
+                                                      $Complaint_Category = "PACKAGING SEAL - LOW";
+                                                        break;
+
+                                                        case '30':
+                                                        $Complaint_Category = "RUNNY - LOW";
+                                                          break;
+
+                                                          case '31':
+                                                          $Complaint_Category = "SHORT COUNT - LOW";
+                                                            break;
+
+                                                            case '32':
+                                                            $Complaint_Category = "SIZE - LOW";
+                                                              break;
+
+                                                              case '33':
+                                                              $Complaint_Category = "STALE - LOW";
+                                                                break;
+
+                                                                case '34':
+                                                                $Complaint_Category = "STICKING - LOW";
+                                                                  break;
+
+                                                                  case '35':
+                                                                  $Complaint_Category = "STICKY - LOW";
+                                                                    break;
+
+                                                                    case '36':
+                                                                    $Complaint_Category = "THIN - LOW";
+                                                                      break;
+
+                                                                      case '37':
+                                                                      $Complaint_Category = "TOO SALTY - LOW";
+                                                                        break;
+
+                                                                        case '38':
+                                                                        $Complaint_Category = "ZIPLOC BAG ISSUE - LOW";
+                                                                          break;
+
+
+
+}
+
+
+//
+function searchPhotos($directory, $code) {
+    $photos = array();
+    if (!is_dir($directory)) {
+        die("Directory not found: $directory");
+    }
+
+    $dir = opendir($directory);
+
+    while (($file = readdir($dir)) !== false) {
+        if ($file == '.' || $file == '..') {
+            continue;
+        }
+
+        $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
+
+        $photoExtensions = array('jpg', 'jpeg', 'png', 'mp4');
+        $fileExtension = pathinfo($fullPath, PATHINFO_EXTENSION);
+
+        if (in_array(strtolower($fileExtension), $photoExtensions)) {
+            if (strpos($file, $code) !== false) {
+                $photos[] = $fullPath;
+            }
+        }
+    }
+
+    closedir($dir);
+    return $photos;
+}
+
+?>
+
+
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>CAPA FORM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPLAINT REPORT</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
     <script type="text/javascript" src="../js/downloadFile.js"></script>
-
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.css" rel="stylesheet">
-    <style>
+		<style>
         .highlight {
             background-color: #b3e0ff;
         }
-        #area {
-            width: 100%;
-            height: 100%;
+        .small-image {
+            width: 300px;
+            height: auto;
+            cursor: pointer;
+            border: 10px;
         }
     </style>
 </head>
+<body>
+  <div class="container mt-4">
+      <div class="card">
+        <br>
+        <?php
+        if (!empty($numberCaseSearch)) {
+            echo "<div class='col-md-3 offset-sm-4 text-center'>
+                <form action='searchNumberCasePrueba.php' method='post'>
+                    <input type='hidden' name='numberCase' id='numberCase' value='$numberCaseSearch'>
+                    <button type='submit' class='btn btn-primary'>Back</button>
+                </form>
+            </div>";
+        } elseif (!empty($startDateSearch) && !empty($endDateSearch)) {
+            // Note: The condition should check for start and end dates when numberCaseSearch is empty
+            echo "<div class='col-md-3 offset-sm-4 text-center'>
+                <form action='searchDatesPrueba.php' method='post'>
+                    <input type='hidden' name='startDate' id='startDate' value='$startDateSearch'>
+                    <input type='hidden' name='endDate' id='endDate' value='$endDateSearch'>
+                    <button type='submit' class='btn btn-primary'>Back</button>
+                </form>
+            </div>";
+        } else {
+            echo "<div class='col-md-3 offset-sm-4 text-center'>
+                <button type='button' class='btn btn-primary' onclick='history.go(-1)'>Back</button>
+            </div>";
+        }
+         ?>
+
+        <br>
+          <div class="card-header bg-primary text-white">
+              <h3 class="card-title">COMPLAINT REPORT</h3>
+          </div>
+          <div class="card-body">
+                  <div class="form-row mb-3">
+                      <div class="form-group col-md-3">
+                          <label for="numberCase">CASE #</label>
+                          <input type="text" class="form-control" name="numberCase" id="numberCase" value="<?php echo $CaseNum; ?>" readonly>
+
+                      </div>
+                      <div class="form-group col-md-3">
+                          <label for="month">MONTH</label>
+                          <input type="number" class="form-control" name="month" id="month" value="<?php echo $Month; ?>" readonly>
+                      </div>
+                      <div class="form-group col-md-3">
+                          <label for="year">YEAR</label>
+                          <input type="number" class="form-control" name="year" id="year" value="<?php echo $Year; ?>" readonly>
+                      </div>
+                      <div class="form-group col-md-3">
+                          <label for="dateRequest">DATE</label>
+                          <input type="text" class="form-control" name="dateRequest" id="dateRequest" value="<?php echo $Date; ?>" readonly>
+                      </div>
+                  </div>
+                <hr/>
+                <div class="form-row mb-3">
+                  <div class="form-group col-md-4">
+                      <label for="fsorretail">FS OR RETAIL</label>
+                      <input type="text" class="form-control" name="fsorretail" id="fsorretail" value="<?php echo $Channel; ?>" readonly>
+                  </div>
+                    <div class="form-group col-md-4">
+                        <label for="complaintCategory">COMPLAINT CATEGORY</label>
+                      	<input type="text" class="form-control" name="complaintCategory" id="complaintCategory" value="<?php echo $Complaint_Category; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="assignedEmployee">ASSIGNED EMPLOYEE</label>
+                        <input type="text" class="form-control" name="asiggnedEmployee" id="assignedEmployee" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $Assigned_Employee; ?>" readonly>
+                    </div>
+
+                </div>
+                <div class="form-row mb-3">
+                  <div class="form-group col-md-4">
+                      <label for="item">ITEM #</label>
+                      <input type="text" class="form-control" name="item" id="item" value="<?php echo $ItemNum; ?>" readonly>
+                  </div>
+                    <div class="form-group col-md-4">
+                        <label for="upcNumber">UPC No.</label>
+                        <input type="text" class="form-control" name="upcNumber" id="upcNumber" value="<?php echo $UPCNum; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="description">DESCRIPTION</label>
+                        <input type="text" class="form-control" name="description" id="description" value="<?php echo $ItemDesc; ?>" readonly>
+                    </div>
+
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="lotCode">LOT - CODE</label>
+                        <input type="text" class="form-control" name="lotCode" id="lotCode" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $LotCode; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="plant">PLANT</label>
+                        <input type="text" class="form-control" name="plant" id="plant" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $Plant; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="lineType">LINE TYPE</label>
+                        <input type="text" class="form-control" name="lineType" id="lineType" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $LineType; ?>" readonly>
+                    </div>
+                </div>
+                <hr/>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="productionDate">PRODUCTION DATE</label>
+                        <input type="text" class="form-control" name="productionDate" id="productionDate" value="<?php
+                                         echo $ProdDate;
+                                         ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productionTime">PRODUCTION TIME</label>
+                        <input type="text" class="form-control" name="productionTime" id="productionTime" value="<?php echo $ProdTime; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productionShift">PRODUCTION SHIFT</label><!--modificado-->
+                    		<input type="number" class="form-control" name="productionShift" id="productionShift" value="<?php echo $ProdShift; ?>" readonly>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="expiryDate">EXPIRY DATE</label>
+                        <input type="text" class="form-control" name="expiryDate" id="expiryDate" value="<?php
+                                        echo $ExpDate; ?>" readonly>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="issueDescription">ISSUE DESCRIPTION</label>
+                    <div><?php echo $IssueDesc; ?></div>
+                </div>
+                <hr/>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="customerContact">CUSTOMER CONTACT</label>
+                        <input type="text" class="form-control" name="customerContact" id="customerContact" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $CustContact; ?>" readonly><!--preguntar si es quien llenara el registro-->
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="yearQuarter">YEAR QUARTER</label><!--modificado-->
+                      	<input type="number" class="form-control" name="yearQuarter" id="yearQuarter" value="<?php echo $YearQt; ?>" readonly>
+                    </div>
+                     <!------>
+                    <div class="form-group col-md-4">
+                        <label for="week">WEEK</label>
+                        <input class="form-control" type="number" name="week" id="week" min="1" max="52" value="<?php echo $Week; ?>" readonly>
+                    </div>
+
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group  col-md-4">
+                       <label for="">CUSTOMER NAME</label>
+                       <input class="form-control" type="text" name="CustomerName" id="CustomerName" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $CustomerName; ?>" readonly>
+                    </div>
+                    <div class="form-group  col-md-6">
+                        <label for="CouponType">COUPON TYPE</label>
+                        <input class="form-control" type="text" name="CouponType" id="CouponType" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $CouponType; ?>" readonly>
+                    </div>
+
+                    <!------>
+                    <div class="form-group col-md-2">
+                        <label for="assignedCoupons">ASSIGNED COUPONS</label>
+                        <input class="form-control" type="number" name="assignedCoupons" id="assignedCoupons" min="0" value="<?php echo $CouponQty; ?>" readonly>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group  col-md-5">
+                        <label for="">ADDRESS</label>
+                        <input class="form-control" type="text" name="Address" id="Address" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $Address; ?>" readonly>
+                    </div>
+
+                    <div class="form-group  col-md-2">
+                        <label for="">PHONE</label>
+                        <input class="form-control" type="text" name="Phone" id="Phone" value="<?php echo $Phone; ?>" readonly>
+                    </div>
+                    <div class="form-group  col-md-5">
+                        <label for="">EMAIL</label>
+                        <input class="form-control" type="text" name="Email" id="Email" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()" value="<?php echo $Email; ?>" readonly>
+                    </div>
+                </div>
+								<hr>
+
+
+
+
+                <form action="update.php" method="post">
+                  <div class="form-group  col-md-3">
+  										<label for="stado">STATUS</label>
+  										<select class="form-control" id="status" name="status" onchange="showInp()">
+  											<option value="0">NEW</option>
+  											<option value="2">IN PROCESS</option>
+  											<option value="1">CLOSED</option>
+  										</select>
+  								</div>
+
+                  <input type="hidden" name="numberCase2" id="numberCase2" value="<?php echo $CaseNum; ?>">
+
+                <div class="form-row" id="resolvedGroup" style="display:none;">
+                  <div class="form-row mb-3">
+									           <div class="form-group col-md-4">
+										                     <label for="">DATE RESOLVED</label>
+										                     <input class="form-control" type="date" name="DateResolved" id="DateResolved">
+									           </div>
+                             <div class="form-group  col-md-4">
+                               <label for="ComplaintSource">COMPLAINT SOURCE</label>
+                               <select class="form-control" name="ComplaintSource" id="ComplaintSource">
+                                 <option value="">SELECT</option>
+                                 <option value="INTERNAL">INTERNAL</option>
+                                 <option value="EXTERNAL">EXTERNAL</option>
+                               </select>
+                             </div>
+                  </div>
+                	<div class="form-group">
+                    <label for="Comments">COMMENTS</label>
+                    <textarea class="form-control" name="Comments" id="Comments" rows="3" onKeyUp="this.value=this.value.toUpperCase()"></textarea>
+									</div>
+                </div>
+                    <div class="form-group mb-3" id="btnUpdate" style="display:none;">
+                         <div class="form-group col-md-6">
+                         <button type="submit" class="btn btn-primary">UPDATE</button>
+                         </div>
+                    </div>
+                     </form>
+
+<?php
+if ($Complaint_Category2 == 1 || $Complaint_Category2 == 2 || $Complaint_Category2 == 3 || $Complaint_Category2 == 4 || $Complaint_Category2 == 5 || $Complaint_Category2 == 6 || $Complaint_Category2 == 7 || $Complaint_Category2 == 8 || $Complaint_Category2 == 9 || $Complaint_Category2 == 10 || $Complaint_Category2 == 11 || $Complaint_Category2 == 12){
+  echo "<div class='col-md-3 offset-sm-4 text-center'>
+    <form action='capaform.php' method='post'>
+      <input type='hidden' name='caseNumber' id='caseNumber' value='$CaseNum'>
+      <button class='btn btn-success' type='submit' name='btnCapaForm'>CAPA FORM</button>
+    </form>
+  </div>";
+}
+ ?>
+
+
+
+                <div class="form-group col-md-12">
+									<hr>
+									<h5>IMAGES ADDED</h5>
+
+									<?php
+                                            $directory = 'uploads';
+                                            $code = $row['CaseNum'];
+
+                                            $photos = searchPhotos($directory, $code);
+
+                                            if (count($photos) > 0) {
+                                                foreach ($photos as $photo) {
+                                                    echo "<img class='small-image' src='$photo' data-toggle='modal' data-target='#imageModal' data-src='$photo'>";
+                                                }
+                                            } else {
+                                                echo "No picture.";
+                                            }
+                                            ?>
+                </div>
+            </div>
+        </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $('#imageModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var src = button.data('src');
+        var modal = $(this);
+        modal.find('.modal-body #modalImage').attr('src', src);
+    });
+</script>
+<script>
+    function showInp() {
+        var getSelectValue = document.getElementById("status").value;
+        var resolvedGroup = document.getElementById("resolvedGroup");
+        var btnUpdate = document.getElementById("btnUpdate");
+        var dateResolved = document.getElementById("DateResolved");
+        var complaintSourse = document.getElementById("ComplaintSource");
+        var comments = document.getElementById("Comments");
+
+        if (getSelectValue == "0") {
+            resolvedGroup.style.display = "none";
+            btnUpdate.style.display = "none";
+            dateResolved.removeAttribute('required');
+            comments.removeAttribute('required');
+
+        }
+        if (getSelectValue == "1") {
+            resolvedGroup.style.display = "block";
+            btnUpdate.style.display = "block";
+            dateResolved.setAttribute('required', 'required');
+            comments.setAttribute('required', 'required');
+        }
+        if (getSelectValue == "2") {
+          resolvedGroup.style.display = "none";
+          btnUpdate.style.display = "block";
+          dateResolved.removeAttribute('required');
+          comments.removeAttribute('required');
+        }
+    }
+</script>
+<script>
+    document.getElementById('displayCheck').onchange = function () {
+        if (this.checked) {
+            document.getElementById('fileInput').style.display = 'block';
+        } else {
+            document.getElementById('fileInput').style.display = 'none';
+        }
+    }
+</script>
+<!-- Bootstrap core JavaScript-->
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="../js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="../js/demo/datatables-demo.js"></script>
 <script>
     $(document).ready(function () {
-        $('#dataTable').DataTable();
+        $(".selected-row").click(function () {
+            $(this).toggleClass("highlight");
+        });
     });
 </script>
 
-<script>
-    function printDiv(printArea) {
-        var contenido = document.getElementById(printArea).innerHTML;
-        var contenidoOriginal = document.body.innerHTML;
+</body>
+</html>
 
-        document.body.innerHTML = contenido;
-        window.print();
-        document.body.innerHTML = contenidoOriginal;
-    }
-</script>
-<body id="page-top">
-<div class="container-fluid">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h3 class="h4 mb-0 text-gray-800">ALL EMPLOYEES </h3>
-            <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                     aria-labelledby="dropdownMenuLink">
-                    <div class="dropdown-header">ACTIONS:</div>
-                    <a class="dropdown-item" onclick="ExportToExcel3('xlsx')">Export Excel</a>
-                    <a class="dropdown-item" onclick="printDiv('printArea')">Print</a>
-                    <div id="printArea">
-                        <div class="card-body">
-                            <div class="table-responsive">
+
+
+****************************************************************
+
+
+
+<?php
+require_once("../includes/config.ini.php");
+date_default_timezone_set('US/Eastern');
+
+
+session_save_path($CONFIG->path);
+session_start();
+
+
+if (!isset($_SESSION['user_name'])) {
+    header("location: /login.php");
+    exit();
+}
+
+
+$username = $_SESSION['user_name'];
+
+require_once("../includes/clases/conexion.php");
+
+$conexion = sqlsrv_connect($serverName, $connectionInfo);
+if ($conexion === false) {
+    die("Conection Error: " . print_r(sqlsrv_errors(), true));
+}
+
+
+$caseNum = isset($_POST['caseNumber']) ? $_POST['caseNumber'] : '';
+
+$SQL = "SELECT * FROM [ComplaintManagement] WHERE CaseNum = ?";
+$parametros = array($caseNum);
+$tabla = sqlsrv_query($conexion, $SQL, $parametros);
+
+if ($tabla === false) {
+    die("Error executing Query: " . print_r(sqlsrv_errors(), true));
+}
+
+$row = sqlsrv_fetch_array($tabla);
+
+
+  $caseNumber = $row['CaseNum'];
+  $oriDate = $row['Date'];
+  $custName = $row['CustomerName'];
+  $productOri = $row['Plant'];
+
+  $severity = $row['Complaint_Category']; //si es high o MEDIUM
+  $productDes = $row['ItemDesc'];
+  $qualityPro = $row['Complaint_Category'];
+
+ ?>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPLAINT REPORT</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="../js/downloadFile.js"></script>
+    <!-- Custom styles for this template-->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+
+    <style>
+    .form-container {
+            display: flex;
+            align-items: flex-start; /* Alineación de inicio */
+        }
+        .step-vertical {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            padding: 10px;
+            font-weight: bold;
+            font-size: 18px; /* Tamaño de la letra ajustado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-sizing: border-box; /* Incluir el padding y borde en el tamaño */
+            height: 40%; /* Ajustar la altura automáticamente */
+        }
+        .step-vertical2 {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            padding: 10px;
+            font-weight: bold;
+            font-size: 18px; /* Tamaño de la letra ajustado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-sizing: border-box; /* Incluir el padding y borde en el tamaño */
+            height: 15%; /* Ajustar la altura automáticamente */
+        }
+        .step-vertical3 {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            padding: 10px;
+            font-weight: bold;
+            font-size: 18px; /* Tamaño de la letra ajustado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-sizing: border-box; /* Incluir el padding y borde en el tamaño */
+            height: 10%; /* Ajustar la altura automáticamente */
+        }
+        .form-content {
+            flex-grow: 1;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+            margin-right: 15px;
+        }
+        .form-group:last-child {
+            margin-right: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">COMPLAINT REPORT</h3>
+        </div>
+        <div class="card-body">
+            <form action="upload.php" method="post" enctype="multipart/form-data">
+                <div class="form-row mb-3">
+                  <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"
                                        border="1">
                                     <tr id="cabecera_1">
                                         <th rowspan="4">imagen</th>
                                         <th rowspan="3" colspan="8">QUALITY SYSTEMS DOCUMENT</th>
                                         <th>DOCUMENT NUMBER:</th>
-                                        <th>OLE-QA-FO-E027</th>                                        
+                                        <th>OLE-QA-FO-E027</th>
                                     </tr>
-                                    <tr>                                        
+                                    <tr>
                                     </tr>
                                     <tr>
                                         <th>REVISION:</th>
                                         <th>0.11.04.2021</th>
-                                        
+
                                     </tr>
-                                    
+
                                     <tr>
                                         <th rowspan="1" colspan="8">CORRECTIVE AND PREVENTIVE ACTION</th>
                                         <th>PAGE</th>
                                         <th>1 OF 2</th>
                                     </tr>
                                     </table>
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"  border="1">
-                                    <tr>
-                                    <td>AUDITOR/ORIGINATOR</td>
-                                    <td>CONSUMER CARE</td>
-                                    <td>ORIGINATION DATE</td>
-                                    <td>______________________</td>
-                                    </tr>
-                                    <tr>
-                                        <td>AFFECTED DEPARTMENT</td>
-                                        <td>_________________________________________________</td>
-                                    </tr>
-                                    <tr>
-                                        <td>PERSONAL INVOICED</td>
-                                        <td>_________________________________________________</td>
-                                    </tr>
-                                    </table>
-                                    <textarea name="area" id="area" rows="5" cols="165"></textarea>
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
-                                    <tr>
-                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
-                                        <td>CUSTOMER COMPLAINT</td>
-                                        <td>CUSTOMER NAME</td>
-                                        <td colspan="4">_____________________________</td>
-                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
-                                        <td>VENDOR NONCONFORMANCE</td>
-                                        <td>VENDOR</td>
-                                        <td colspan="4">_____________________________</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
-                                        <td>RETURNED PRODUCT</td>
-                                        <td>PRODUCT ORIGIN</td>
-                                        <td colspan="4">_____________________________</td>
-                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
-                                        <td>EXTERNAL AUDIT</td>
-                                        <td>3RD-</td>
-                                        <td colspan="4">_____________________________</td>
-                                    </tr>
-                                    </table>
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
-                                    <tr>
-                                    <td colspan="1"><input type="checkbox" name="" id=""></td>
-                                        <td>INCIDENTE/CCP</td>
-                                        <td>SEVERITY</td>
-                                        <td>________________</td>
-                                        <td colspan="1"><input type="checkbox" name="" id=""></td>
-                                        <td>PREVENTIVE ACTION</td>
-                                        <td>________________</td>
-                                        
-                                    </tr>
-                                    </table>
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
-                                    <tr>
-                                        <td>PRODUCT SKU</td>
-                                        <td>____________________________</td>
-                                        <td>PRODUCT DESCRIPTION</td>
-                                        <td>____________________________</td>
-                                        <td>CONSUMER AFFECTED</td>
-                                        <td>_________________________-_</td>
-                                    </tr>
-                                    </table>
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" border="1">
-                                    <tr>
-                                        <td>QUALITY OF PRODUCT</td>
-                                        <td>____________________________</td>
-                                        <td>LOT / BATCH #</td>
-                                        <td>____________________________</td>
-                                        <td>EXP</td>
-                                        <td>_________________________-_</td>
-                                        <td>ITEM #</td>
-                                        <td>_________________________</td>
-                                    </tr>
-                                    </table>
-                            </div>
-                        </div>
+                                  </div>
+                                  </div>
+                                    <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="numberCase">CASE #</label>
+                        <input type="text" class="form-control" name="numberCase" id="numberCase" value="<?php echo $caseNumber; ?>" readonly>
+                    </div>
+
+
+                </div>
+                <hr/>
+
+
+
+<div class="form-container">
+  <div class="step-vertical">
+STEP 1
+</div>
+<div class="form-content">
+  <div class="form-row text-center">
+    <h5>DEFINE THE NONCONFORMANCE</h5>
+    	</div>
+								<div class="form-row mb-3">
+									<div class="form-group col-md-3">
+											<label for="auditor">AUDITOR/ORIGINATOR</label>
+											<input class="form-control" type="text" name="auditor" id="auditor" value="CONSUMER CARE" readonly>
+									</div>
+                    <div class="form-group col-md-3">
+
+                          <label for="dateRequest">ORIGINATION DATE</label>
+                          <input type="date" class="form-control" name="dateRequest" id="dateRequest" required>
+
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="department">AFFECTED DEPARTMENT</label>
+                        <input type="text" class="form-control" name="department" id="department" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="personal">PERSONAL INVOLVED</label>
+                        <input type="text" class="form-control" name="personal" id="personal" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
                     </div>
                 </div>
+
+								<div class="form-row mb-3">
+                  <div class="form-group col-md-3">
+                    <input type="checkbox" name="customercomplaint" id="customercomplaint">
+                      <label for="upcNumber1">CUSTOMER COMPLAINT</label>
+                  </div>
+					                    <div class="form-group col-md-3">
+                                <input type="checkbox" name="returnedproduct" id="returnedproduct">
+                                  <label for="returnedproduct">RETURNED PRODUCT</label>
+
+					                    </div>
+                              <div class="form-group col-md-2">
+                                <input type="checkbox" name="incident" id="incident">
+                                  <label for="incident">INCIDENT/CCP</label>
+
+					                    </div>
+                              <div class="form-group col-md-4">
+                                <input type="checkbox" name="atpswap" id="atpswap">
+                                  <label for="atpswap">ATP SWAP RESULT DEVIATION</label>
+
+					                    </div>
+					                </div>
+                          <div class="form-row mb-3">
+                            <div class="form-group col-md-4">
+                              <input type="checkbox" name="vendor" id="vendor">
+                                <label for="vendor">VENDOR NON CONFORMANCE</label>
+                            </div>
+          					                    <div class="form-group col-md-2">
+                                          <input type="checkbox" name="external" id="external">
+                                            <label for="external">EXTERNAL AUDIT</label>
+
+          					                    </div>
+                                        <div class="form-group col-md-3">
+                                          <input type="checkbox" name="preventive" id="preventive">
+                                            <label for="preventive">PREVENTIVE ACTION</label>
+
+          					                    </div>
+                                        <div class="form-group col-md-3">
+                                          <input type="checkbox" name="onhold" id="onhold">
+                                            <label for="onhold">PRODUCTO ON HOLD</label>
+
+          					                    </div>
+          					                </div>
+
+
+
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="customername">CUSTOMER NAME</label>
+                        <input type="text" class="form-control" name="customername" id="customername" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="productorigin">PRODUCT ORIGIN</label>
+                        <input type="text" class="form-control" name="productorigin" id="productorigin" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="severity">SEVERITY</label>
+                        <input type="text" class="form-control" name="severity" id="severity" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="vendor">VENDOR</label>
+                        <input type="text" class="form-control" name="vendor" id="vendor" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="sku">PRODUCT SKU#</label>
+                        <input type="text" class="form-control" name="sku" id="sku" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="productdescription">PRODUCT DESCRIPTION</label>
+                        <input type="text" class="form-control" name="productdescription" id="productdescription" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="affected">COSTUMER AFFECTED</label>
+                        <input type="text" class="form-control" name="affected" id="affected" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+
+                </div>
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-3">
+                        <label for="sku">QUALITY OF PRODUCT</label>
+                        <input type="text" class="form-control" name="sku" id="sku" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="lotbatch">LOT/BATCH #</label>
+                        <input type="text" class="form-control" name="lotbatch" id="lotbatch" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exp">EXP</label>
+                        <input type="text" class="form-control" name="exp" id="exp" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="item">ITEM #</label>
+                        <input type="text" class="form-control" name="item" id="item" onKeyUp="document.getElementById(this.id).value=document.getElementById(this.id).value.toUpperCase()">
+                    </div>
+
+                </div>
+                <div class="form-row mb-3">
+
+                        <label for="brief">BRIEF DESCRIPTION</label>
+                      <textarea class="form-control" name="brief" id="brief" rows="4" cols="80"></textarea>
+
+                </div>
+              </div>
             </div>
+
+                <hr>
+
+
+                <div class="form-container">
+                  <div class="step-vertical2">
+                STEP 2
+                <br>
+                SHORT TERM <br> FIX
+                </div>
+                <div class="form-content">
+
+
+                                <div class="form-row mb-3">
+
+                                        <label for="dispnon"><h5>DISPOSITION OF NONCONFORMING PRODUCT</h5></label>
+                                      <textarea class="form-control" name="dispnon" id="dispnon" rows="4" cols="80"></textarea>
+
+                                </div>
+                                <div class="form-row mb-3">
+                									<div class="form-group col-md-6">
+                											<label for="persondepartment">REPONSABLE PERSON/DEPARTMENT</label>
+                											<input class="form-control" type="text" name="persondepartment" id="persondepartment">
+                									</div>
+                                    <div class="form-group col-md-6">
+
+                                          <label for="duedate">DUE DATE</label>
+                                          <input type="date" class="form-control" name="duedate" id="duedate">
+
+                                    </div>
+
+                                </div>
+                              </div>
+                            </div>
+
+                                <hr>
+                                <div class="form-container">
+                                  <div class="step-vertical3">
+                                STEP 3
+                                <br>
+                                ROOT CAUSE ANALYSIS
+                                </div>
+                                <div class="form-content">
+
+
+                                                <div class="form-row mb-3">
+
+                                                        <label for="caused"><h5>WHAT CAUSED THE NONCONFORMANCE?</h5></label>
+                                                      <textarea class="form-control" name="caused" id="caused" rows="4" cols="80"></textarea>
+
+                                                </div>
+
+                                              </div>
+                                            </div>
+
+                                                <hr>
+                                                <div class="form-container">
+                                                  <div class="step-vertical2">
+                                                STEP 4
+                                                <br>
+                                                CORRECTIVE <br> ACTION
+                                                </div>
+                                                <div class="form-content">
+
+
+                                                                <div class="form-row mb-3">
+
+                                                                        <label for="steps"><h5>WHAT STEPS HAVE BEEN IMPLEMENTED TO PREVENT RECURRENCE?</h5></label>
+                                                                      <textarea class="form-control" name="steps" id="steps" rows="4" cols="80"></textarea>
+
+                                                                </div>
+                                                                <div class="form-row mb-3">
+                                                                  <div class="form-group col-md-6">
+                                                                      <label for="persondepartment2">REPONSABLE PERSON/DEPARTMENT</label>
+                                                                      <input class="form-control" type="text" name="persondepartment2" id="persondepartment2">
+                                                                  </div>
+                                                                    <div class="form-group col-md-6">
+
+                                                                          <label for="duedate2">DUE DATE</label>
+                                                                          <input type="date" class="form-control" name="duedate2" id="duedate2">
+
+                                                                    </div>
+
+                                                                </div>
+                                                              </div>
+                                                            </div>
+
+                                                                <hr>
+                                                                <div class="form-container">
+                                                                  <div class="step-vertical2">
+                                                                STEP 5
+                                                                <br>
+                                                                FOLLOW <br>UP
+                                                                </div>
+                                                                <div class="form-content">
+
+
+                                                                                <div class="form-row mb-3">
+
+                                                                                        <label for="steps"><h5>WHAT EVIDENCE WAS OBSERVED TO ENSURE EFFECTIVENESS?</h5></label>
+                                                                                      <textarea class="form-control" name="steps" id="steps" rows="4" cols="80"></textarea>
+
+                                                                                </div>
+                                                                                <div class="form-row mb-3">
+                                                                                  <div class="form-group col-md-6">
+                                                                                    <label for="followup">FOLLOW-UP DUE DATE</label>
+                                                                                    <input type="date" class="form-control" name="followup" id="followup">
+                                                                                  </div>
+                                                                                  <div class="form-group col-md-6">
+                                                                                      <label for="personnel">DEPARTMENT RESPONSABLE PERSONNEL</label>
+                                                                                      <input class="form-control" type="text" name="personnel" id="personnel">
+                                                                                  </div>
+                                                                                  <div class="form-group col-md-6">
+                                                                                      <label for="implementedby">IMPLEMENTED BY</label>
+                                                                                      <input class="form-control" type="text" name="implementedby" id="implementedby">
+                                                                                  </div>
+                                                                                  <div class="form-group col-md-6">
+                                                                                      <label for="qainitials">QA INITIALS</label>
+                                                                                      <input class="form-control" type="text" name="qainitials" id="qainitials">
+                                                                                  </div>
+
+                                                                                </div>
+                                                                              </div>
+                                                                            </div>
+                                                                            <hr>
+                                                                            <div class="form-container">
+                                                                              <div class="step-vertical3">
+                                                                            STEP 6
+                                                                            <br>
+                                                                            ADDITIONAL NOTES
+                                                                            </div>
+                                                                            <div class="form-content">
+
+
+                                                                                            <div class="form-row mb-3">
+
+                                                                                                    <label for="aditional"><h5>ADDITIONAL NOTES</h5></label>
+                                                                                                  <textarea class="form-control" name="aditional" id="steps" rows="4" cols="80"></textarea>
+
+                                                                                            </div>
+
+                                                                                          </div>
+                                                                                        </div>
+
+
+                <div class="form-group mb-3"
+                <div class="form-group col-md-6">
+                <button type="submit" class="btn btn-primary">SUBMIT</button>
+                </div>
+                </div>
+            </form>
+							</div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap Bundle JS with Popper -->
-<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function fetchProductInfo() {
+    var itemId = document.getElementById('item').value;
+
+    if (!itemId) {
+        alert("Por favor, ingrese un número de ítem.");
+        return;
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'searchItem.php?id=' + encodeURIComponent(itemId), true);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+
+            if (response.error) {
+                alert(response.error);
+                document.getElementById('upcNumber').value = '';
+                document.getElementById('description').value = '';
+            } else {
+                document.getElementById('upcNumber').value = response.ProductBarcode;
+                document.getElementById('description').value = response.ProductName;
+
+                // Llenar campos ocultos en el formulario con los valores obtenidos
+                document.getElementById('hidden_upcNumber').value = response.ProductBarcode;
+                document.getElementById('hidden_description').value = response.ProductName;
+            }
+        }
+    };
+
+    xhr.send();
+}
+</script>
+
+
+<script>
+document.getElementById('displayCheck').onchange = function(){
+    if (this.checked) {document.getElementById('fileInput').style.display='block';
+	}else{document.getElementById('fileInput').style.display='none';
+    }
+}
+</script>
+<!-- Bootstrap core JavaScript-->
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="../js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="../js/demo/datatables-demo.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".selected-row").click(function() {
+            $(this).toggleClass("highlight");
+        });
+    });
+</script>
+<script>
+    var dateRequest = new Date();
+    var year = dateRequest.getFullYear();
+    var month = (dateRequest.getMonth() + 1).toString().padStart(2, '0');
+    var day = dateRequest.getDate().toString().padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+    document.getElementById('dateRequest').value = formattedDate;
+		document.getElementById('month').value = month;
+		document.getElementById('year').value = year;
+</script>
+
 </body>
 </html>
+
