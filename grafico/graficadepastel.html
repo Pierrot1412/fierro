@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Pastel</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px; /* Tamaño inicial mediano */
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gráfico de Pastel</h1>
+
+        <!-- Selector de fechas -->
+        <label for="startDate">Fecha de inicio:</label>
+        <input type="date" id="startDate" name="startDate">
+        <label for="endDate">Fecha de fin:</label>
+        <input type="date" id="endDate" name="endDate">
+        <button onclick="updateChart()">Actualizar</button>
+
+        <label for="sizeSelector">Seleccione el tamaño de la gráfica:</label>
+        <select id="sizeSelector">
+            <option value="small">Chico</option>
+            <option value="medium">Mediano</option>
+            <option value="large" selected>Grande</option>
+        </select>
+
+        <div class="chart-container" id="chartContainer">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let pieChart = null;
+        let chartData = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            setDefaultDates();
+            fetchData(); // Fetch data when the page loads
+        });
+
+        function setDefaultDates() {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+
+            startDate.value = yesterday.toISOString().split('T')[0];
+            endDate.value = today.toISOString().split('T')[0];
+        }
+
+        function fetchData() {
+            fetch('data.php')
+                .then(response => response.json())
+                .then(data => {
+                    chartData = data; // Store fetched data in global variable
+                    localStorage.setItem('chartData', JSON.stringify(chartData)); // Save to localStorage
+                    renderChart();
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function renderChart() {
+            const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || ['label', 'value'];
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            const filteredData = filterDataByDate(chartData);
+
+            if (pieChart) {
+                pieChart.destroy(); // Destroy the previous chart instance if it exists
+            }
+
+            pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: filteredData.map(row => row[selectedColumns[0]]),
+                    datasets: [{
+                        data: filteredData.map(row => row[selectedColumns[1]]),
+                        backgroundColor: ['red', 'blue', 'green', 'yellow']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 14 // Tamaño de fuente de la leyenda
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const sizeSelector = document.getElementById('sizeSelector');
+            const chartContainer = document.getElementById('chartContainer');
+
+            sizeSelector.addEventListener('change', function () {
+                const size = this.value;
+                let chartHeight = 400; // Default to medium size
+
+                if (size === 'small') {
+                    chartHeight = 200;
+                } else if (size === 'large') {
+                    chartHeight = 600;
+                }
+
+                chartContainer.style.height = chartHeight + 'px';
+                pieChart.resize(); // Resize the pie chart
+            });
+        }
+
+        function filterDataByDate(data) {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                return data; // Return all data if no dates are selected
+            }
+
+            return data.filter(row => {
+                const prodDate = new Date(row['ProdDate']);
+                return prodDate >= new Date(startDate) && prodDate <= new Date(endDate);
+            });
+        }
+
+        function updateChart() {
+            renderChart();
+        }
+    </script>
+</body>
+</html>

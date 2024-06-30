@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Dispersión</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px; /* Tamaño inicial mediano */
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gráfico de Dispersión</h1>
+
+        <label for="sizeSelector">Seleccione el tamaño de la gráfica:</label>
+        <select id="sizeSelector">
+            <option value="small">Chico</option>
+            <option value="medium">Mediano</option>
+            <option value="large" selected>Grande</option>
+        </select>
+
+        <div class="chart-container" id="chartContainer">
+            <canvas id="scatterChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartData = JSON.parse(localStorage.getItem('chartData')) || [{x: 10, y: 20}, {x: 30, y: 40}, {x: 50, y: 60}, {x: 70, y: 80}];
+            const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || ['x', 'y'];
+
+            let scatterChart = null; // Variable para almacenar la instancia del gráfico
+
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+            scatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Scatter Dataset',
+                        data: chartData.map(row => ({
+                            x: row[selectedColumns[0]],
+                            y: row[selectedColumns[1]]
+                        })),
+                        backgroundColor: 'green'
+                    }]
+                },
+                options: {
+                    responsive: true, // Permite que el gráfico sea responsive
+                    maintainAspectRatio: false, // Permite controlar el aspect ratio
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            const sizeSelector = document.getElementById('sizeSelector');
+            const chartContainer = document.getElementById('chartContainer');
+
+            sizeSelector.addEventListener('change', function () {
+                const size = this.value;
+                let chartHeight = 400; // Tamaño mediano por defecto
+
+                if (size === 'small') {
+                    chartHeight = 200;
+                } else if (size === 'large') {
+                    chartHeight = 600;
+                }
+
+                chartContainer.style.height = chartHeight + 'px';
+                scatterChart.resize(); // Redimensiona el gráfico
+            });
+        });
+    </script>
+</body>
+</html>

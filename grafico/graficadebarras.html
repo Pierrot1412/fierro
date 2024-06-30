@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Barras</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px; /* Tamaño inicial mediano */
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gráfico de Barras</h1>
+
+        <!-- Selector de fechas -->
+        <label for="startDate">Fecha de inicio:</label>
+        <input type="date" id="startDate" name="startDate">
+        <label for="endDate">Fecha de fin:</label>
+        <input type="date" id="endDate" name="endDate">
+        <button onclick="updateChart()">Actualizar</button>
+
+        <label for="sizeSelector">Seleccione el tamaño de la gráfica:</label>
+        <select id="sizeSelector">
+            <option value="small">Chico</option>
+            <option value="medium">Mediano</option>
+            <option value="large" selected>Grande</option>
+        </select>
+
+        <div class="chart-container" id="chartContainer">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let barChart = null;
+        let chartData = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchData(); // Fetch data when the page loads
+        });
+
+        function fetchData() {
+            fetch('data.php')
+                .then(response => response.json())
+                .then(data => {
+                    chartData = data; // Store fetched data in global variable
+                    localStorage.setItem('chartData', JSON.stringify(chartData)); // Save to localStorage
+                    renderChart();
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function renderChart() {
+            const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || ['label', 'value'];
+            const ctx = document.getElementById('barChart').getContext('2d');
+            const filteredData = filterDataByDate(chartData);
+
+            if (barChart) {
+                barChart.destroy(); // Destroy the previous chart instance if it exists
+            }
+
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: filteredData.map(row => row[selectedColumns[0]]),
+                    datasets: [{
+                        label: selectedColumns[1],
+                        data: filteredData.map(row => row[selectedColumns[1]]),
+                        backgroundColor: 'blue'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            const sizeSelector = document.getElementById('sizeSelector');
+            const chartContainer = document.getElementById('chartContainer');
+
+            sizeSelector.addEventListener('change', function () {
+                const size = this.value;
+                let chartHeight = 400; // Default to medium size
+
+                if (size === 'small') {
+                    chartHeight = 200;
+                } else if (size === 'large') {
+                    chartHeight = 600;
+                }
+
+                chartContainer.style.height = chartHeight + 'px';
+                barChart.resize(); // Resize the bar chart
+            });
+        }
+
+        function filterDataByDate(data) {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                return data; // Return all data if no dates are selected
+            }
+
+            return data.filter(row => {
+                const prodDate = new Date(row['ProdDate']);
+                return prodDate >= new Date(startDate) && prodDate <= new Date(endDate);
+            });
+        }
+
+        function updateChart() {
+            renderChart();
+        }
+    </script>
+</body>
+</html>

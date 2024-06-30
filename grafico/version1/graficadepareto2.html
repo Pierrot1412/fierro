@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Pareto</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px; /* Tamaño inicial mediano */
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Diagrama de Pareto</h1>
+
+        <label for="sizeSelector">Seleccione el tamaño del gráfico:</label>
+        <select id="sizeSelector">
+            <option value="small">Chico</option>
+            <option value="medium">Mediano</option>
+            <option value="large" selected>Grande</option>
+        </select>
+
+        <div class="chart-container" id="chartContainer">
+            <canvas id="paretoChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartData = JSON.parse(localStorage.getItem('chartData'));
+            const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns'));
+            const selectedAxis = JSON.parse(localStorage.getItem('selectedAxis'));
+
+            if (!chartData || !selectedColumns || !selectedAxis) {
+                console.error('Datos no encontrados en localStorage.');
+                return;
+            }
+
+            // Función para calcular el porcentaje acumulado
+            function calcularPorcentajeAcumulado(data) {
+                const total = data.reduce((acc, curr) => acc + curr.value, 0);
+                let cumulativePercentage = 0;
+                return data.map(row => {
+                    cumulativePercentage += (row.value / total) * 100;
+                    return cumulativePercentage.toFixed(2); // Redondear el porcentaje acumulado
+                });
+            }
+
+            // Ordenar los datos por valor descendente
+            chartData.sort((a, b) => b[selectedColumns[1]] - a[selectedColumns[1]]);
+                
+            // Calcular el porcentaje acumulado
+            const cumulativePercentages = calcularPorcentajeAcumulado(chartData);
+
+            const ctx = document.getElementById('paretoChart').getContext('2d');
+            const paretoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(row => row[selectedColumns[0]]),
+                    datasets: [{
+                        label: selectedColumns[1],
+                        data: chartData.map(row => row[selectedColumns[1]]),
+                        backgroundColor: 'blue'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valor'
+                            }
+                        },
+                        'porcentaje-y-axis': {
+                            position: 'right',
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Porcentaje Acumulado (%)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Agregar la línea de porcentaje acumulado como un dataset adicional al inicio para que esté al frente
+            paretoChart.data.datasets.unshift({
+                type: 'line',
+                label: 'Porcentaje Acumulado',
+                data: cumulativePercentages,
+                fill: false,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                yAxisID: 'porcentaje-y-axis'
+            });
+
+            paretoChart.update(); // Actualizar el gráfico para mostrar la línea de porcentaje acumulado
+
+            const sizeSelector = document.getElementById('sizeSelector');
+            const chartContainer = document.getElementById('chartContainer');
+
+            sizeSelector.addEventListener('change', function () {
+                const size = this.value;
+                let chartHeight = 400; // Tamaño mediano por defecto
+
+                if (size === 'small') {
+                    chartHeight = 200;
+                } else if (size === 'large') {
+                    chartHeight = 600;
+                }
+
+                chartContainer.style.height = chartHeight + 'px';
+                paretoChart.resize(); // Redimensiona el gráfico de Pareto
+            });
+        });
+    </script>
+</body>
+</html>

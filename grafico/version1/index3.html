@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+<style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        }
+        .chart-container canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+<body>
+    <h1>Dashboard</h1>
+
+    <!-- Contenedores para las gráficas -->
+    <canvas id="pieChart"></canvas>
+    <canvas id="paretoChart"></canvas>
+    <canvas id="barChart"></canvas>
+    <canvas id="scatterChart"></canvas>
+
+    <div class="container-fluid">  
+        <div class="row">
+            <!-- Columna izquierda para el formulario y controles -->
+            <div class="col-lg-4">
+                <h1>Dashboard</h1>
+                <form id="chartForm">
+                    <div>
+                        <h3>Seleccione columnas y gráficos</h3>
+                        <!-- Checkboxes y selects se llenarán dinámicamente con JavaScript -->
+                        <div id="chartSelectors">
+                            <input type="checkbox" name="chartType" value="pie"> Gráfico de Pastel<br>
+                            <input type="checkbox" name="chartType" value="pareto"> Diagrama de Pareto<br>
+                            <input type="checkbox" name="chartType" value="bar"> Gráfico de Barras<br>
+                            <input type="checkbox" name="chartType" value="scatter"> Gráfico de Dispersión<br>
+                        </div>
+                        <button type="button" onclick="addChart()">Agregar</button>
+                        <button type="button" onclick="removeChart()">Quitar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Columna derecha para las columnas extraídas de SQL Server -->
+            <div class="col-lg-8">
+                <h3>Columnas extraídas de SQL Server</h3>
+                <div id="columnSelectors">
+                    <!-- Aquí se llenarán dinámicamente las columnas -->
+                </div>
+            </div>
+        </div>
+    <!-- Cuadro para añadir imagen -->
+    <div>
+        <h3>Agregar Imagen</h3>
+        <input type="file" id="imageInput">
+        <img id="selectedImage" src="" alt="Imagen seleccionada" style="display:none;">
+    </div>
+
+    <!-- Cuadro para expresar el valor de una variable -->
+    <div>
+        <h3>Valor de la variable</h3>
+        <p id="variableValue"></p>
+    </div>
+
+    <script>
+        // Fetch data from server
+        fetch('data.php')
+            .then(response => response.json())
+            .then(data => {
+                const columns = Object.keys(data[0]);
+
+                // Create column selectors dynamically
+                const columnSelectors = document.getElementById('columnSelectors');
+                columns.forEach(column => {
+                    let div = document.createElement('div');
+                    div.innerHTML = `
+                        <input type="checkbox" name="columns" value="${column}"> ${column}
+                        <select name="axis">
+                            <option value="x">Eje X</option>
+                            <option value="y">Eje Y</option>
+                        </select>
+                    `;
+                    columnSelectors.appendChild(div);
+                });
+
+                window.chartData = data; // Store data globally
+            });
+
+        function addChart() {
+            const selectedColumns = Array.from(document.querySelectorAll('input[name="columns"]:checked')).map(input => input.value);
+            const selectedChartTypes = Array.from(document.querySelectorAll('input[name="chartType"]:checked')).map(input => input.value);
+            const selectedAxis = Array.from(document.querySelectorAll('select[name="axis"]')).map(select => select.value);
+
+            if (selectedColumns.length < 2 || selectedChartTypes.length === 0) {
+                alert("Seleccione al menos dos columnas y un tipo de gráfico.");
+                return;
+            }
+
+            selectedChartTypes.forEach(chartType => {
+                let url = '';
+                if (chartType === 'pie') {
+                    url = 'graficadepastel.html';
+                } else if (chartType === 'bar') {
+                    url = 'graficadebarras.html';
+                } else if (chartType === 'pareto') {
+                    url = 'graficadepareto.html';
+                } else if (chartType === 'scatter') {
+                    url = 'graficadedispersion.html';
+                }
+
+                if (url) {
+                    // Save selected data in localStorage to pass it to the new page
+                    localStorage.setItem('chartData', JSON.stringify(window.chartData));
+                    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+                    localStorage.setItem('selectedAxis', JSON.stringify(selectedAxis));
+
+                    // Redirect to the appropriate page
+                    window.location.href = url;
+                }
+            });
+        }
+
+        document.getElementById('imageInput').addEventListener('change', function() {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('selectedImage').src = e.target.result;
+                document.getElementById('selectedImage').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('variableValue').textContent = 'Valor de la variable';
+    </script>
+</body>
+</html>
